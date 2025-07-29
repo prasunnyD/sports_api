@@ -8,7 +8,8 @@ RUN apk add --no-cache git ca-certificates
 WORKDIR /app
 
 # Copy go mod files
-COPY go.mod go.sum ./
+COPY go.mod ./
+COPY go.sum* ./
 
 # Download dependencies
 RUN go mod download
@@ -16,8 +17,8 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o nfl-api main.go
+# Generate go.sum and build the application
+RUN go mod tidy && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o sports-api main.go
 
 # Final stage
 FROM alpine:latest
@@ -33,7 +34,7 @@ RUN addgroup -g 1001 -S appgroup && \
 WORKDIR /app
 
 # Copy binary from builder stage
-COPY --from=builder /app/nfl-api .
+COPY --from=builder /app/sports-api .
 
 # Change ownership to non-root user
 RUN chown -R appuser:appgroup /app
@@ -49,4 +50,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/v1/health || exit 1
 
 # Run the application
-CMD ["./nfl-api"] 
+CMD ["./sports-api"] 

@@ -1,12 +1,25 @@
-# NFL Roster API
+# Sports API (NFL & NBA)
 
-A Go-based REST API framework that provides access to NFL roster data stored in MotherDuck. The API allows you to retrieve player information for specific NFL teams.
+A Go-based REST API framework that provides access to NFL and NBA data stored in MotherDuck. The API allows you to retrieve player information, team statistics, and game data for both NFL and NBA.
 
 ## Features
 
+### NFL Features
 - 🏈 Retrieve all players for a specific NFL team
-- 📋 Get a list of all available teams
+- 📋 Get a list of all available NFL teams
 - 🔍 Case-insensitive team name search
+
+### NBA Features
+- 🏀 Retrieve all players for a specific NBA team
+- 📊 Get comprehensive team and player statistics
+- 🎯 Player game logs and performance analytics
+- 🛡️ Team defensive statistics
+- 📈 Player shooting splits and headline stats
+- 🔮 Points prediction (placeholder)
+- 📊 Poisson distribution calculations
+- 🏆 Live scoreboard (placeholder)
+
+### General Features
 - 🚀 Fast and efficient with DuckDB/MotherDuck
 - 🔒 Secure connection with MotherDuck token authentication
 - 🌐 CORS-enabled for web applications
@@ -17,11 +30,13 @@ A Go-based REST API framework that provides access to NFL roster data stored in 
 - Go 1.21 or higher
 - MotherDuck account and token
 - Access to the `nfl_data.nfl_roster_db` table in MotherDuck
+- Access to NBA data tables in MotherDuck (for NBA features)
 
 ## Database Schema
 
-The API connects to a MotherDuck database with the following schema:
+The API connects to a MotherDuck database with the following schemas:
 
+### NFL Schema
 ```sql
 CREATE TABLE nfl_roster_db(
   player_id VARCHAR,
@@ -31,6 +46,18 @@ CREATE TABLE nfl_roster_db(
   team_id VARCHAR
 );
 ```
+
+### NBA Schema
+The NBA API expects the following tables in the `nba_data` schema:
+- `nba_roster_db`: Player roster information
+- `player_boxscores`: Individual player game statistics
+- `team_boxscores`: Team game statistics
+- `teams_opponent_stats`: Team opponent statistics
+- `teams_defense_stats`: Team defensive statistics
+- `teams_advanced_stats`: Team advanced statistics
+- `teams_four_factors_stats`: Team four factors statistics
+- `player_shooting_splits`: Player shooting statistics
+- `player_headline_stats`: Player headline statistics
 
 ## Installation
 
@@ -83,14 +110,18 @@ GET /api/v1/health
 ```json
 {
   "status": "healthy",
-  "message": "NFL API is running",
+  "message": "Sports API (NFL & NBA) is running",
   "version": "1.0.0"
 }
 ```
 
-### Get Players by Team
+## API Endpoints
+
+### NFL Endpoints
+
+#### Get Players by Team
 ```
-GET /api/v1/players/{team_name}
+GET /api/v1/nfl/players/{team_name}
 ```
 
 **Parameters:**
@@ -115,7 +146,7 @@ GET /api/v1/players/{team_name}
 
 ### Get All Teams
 ```
-GET /api/v1/teams
+GET /api/v1/nfl/teams
 ```
 
 **Response:**
@@ -131,21 +162,97 @@ GET /api/v1/teams
 }
 ```
 
+### NBA Endpoints
+
+For detailed NBA API documentation, see [NBA_API_README.md](NBA_API_README.md).
+
+#### Get All NBA Teams
+```
+GET /api/v1/nba/teams
+```
+
+#### Get NBA Players by Team
+```
+GET /api/v1/nba/players/{city}
+```
+
+#### Get Team Roster
+```
+GET /api/v1/nba/roster/{city}
+```
+
+#### Get Player's Last X Games
+```
+GET /api/v1/nba/player/{name}/last/{last_number_of_games}/games
+```
+
+#### Get Team's Last X Games
+```
+GET /api/v1/nba/team/{city}/last/{number_of_days}/games
+```
+
+#### Get Team Defense Stats
+```
+GET /api/v1/nba/{team_name}/defense-stats
+```
+
+#### Get Player Shooting Splits
+```
+GET /api/v1/nba/{player_name}/shooting-splits
+```
+
+#### Get Player Headline Stats
+```
+GET /api/v1/nba/{player_name}/headline-stats
+```
+
+#### Points Prediction
+```
+POST /api/v1/nba/points-prediction/{player_name}
+```
+
+#### Poisson Distribution
+```
+POST /api/v1/nba/poisson-dist
+```
+
+#### Get Scoreboard
+```
+GET /api/v1/nba/scoreboard
+```
+
 ## Usage Examples
 
 ### Using curl
 
+#### NFL Examples
 1. Get players for a specific team:
 ```bash
-curl http://localhost:8080/api/v1/players/Kansas%20City%20Chiefs
+curl http://localhost:8080/api/v1/nfl/players/Kansas%20City%20Chiefs
 ```
 
 2. Get all available teams:
 ```bash
-curl http://localhost:8080/api/v1/teams
+curl http://localhost:8080/api/v1/nfl/teams
 ```
 
-3. Health check:
+#### NBA Examples
+3. Get all NBA teams:
+```bash
+curl http://localhost:8080/api/v1/nba/teams
+```
+
+4. Get Lakers roster:
+```bash
+curl http://localhost:8080/api/v1/nba/players/Los%20Angeles
+```
+
+5. Get LeBron's last 10 games:
+```bash
+curl http://localhost:8080/api/v1/nba/player/LeBron%20James/last/10/games
+```
+
+6. Health check:
 ```bash
 curl http://localhost:8080/api/v1/health
 ```
@@ -153,8 +260,8 @@ curl http://localhost:8080/api/v1/health
 ### Using JavaScript/Fetch
 
 ```javascript
-// Get players for a team
-fetch('http://localhost:8080/api/v1/players/Kansas%20City%20Chiefs')
+// Get NFL players for a team
+fetch('http://localhost:8080/api/v1/nfl/players/Kansas%20City%20Chiefs')
   .then(response => response.json())
   .then(data => {
     console.log(`Found ${data.count} players for ${data.team}`);
@@ -163,12 +270,35 @@ fetch('http://localhost:8080/api/v1/players/Kansas%20City%20Chiefs')
     });
   });
 
-// Get all teams
-fetch('http://localhost:8080/api/v1/teams')
+// Get all NFL teams
+fetch('http://localhost:8080/api/v1/nfl/teams')
   .then(response => response.json())
   .then(data => {
     console.log(`Available teams: ${data.teams.join(', ')}`);
   });
+
+// Get NBA player shooting splits
+fetch('http://localhost:8080/api/v1/nba/LeBron%20James/shooting-splits')
+  .then(response => response.json())
+  .then(data => {
+    console.log('Player shooting stats:', data);
+  });
+
+// Points prediction
+fetch('http://localhost:8080/api/v1/nba/points-prediction/LeBron%20James', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    opp_city: 'Golden State',
+    minutes: 32.5
+  })
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Projected points:', data.projected_points);
+});
 ```
 
 ## Error Handling

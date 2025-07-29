@@ -8,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 	"sports_api/internal/database"
-	"sports_api/internal/handlers"
+	"sports_api/internal/routes"
 )
 
 func main() {
@@ -49,16 +49,8 @@ func main() {
 		c.Next()
 	})
 
-	// Initialize handlers with database
-	playerHandler := handlers.NewPlayerHandler(db)
-
-	// API routes
-	api := router.Group("/api/v1")
-	{
-		api.GET("/health", handlers.HealthCheck)
-		api.GET("/players/:team", playerHandler.GetPlayersByTeam)
-		api.GET("/teams", playerHandler.GetAllTeams)
-	}
+	// Setup all routes
+	routes.SetupRoutes(router, db)
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")
