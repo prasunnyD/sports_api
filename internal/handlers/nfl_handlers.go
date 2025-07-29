@@ -67,3 +67,30 @@ func (h *PlayerHandler) GetAllTeams(c *gin.Context) {
 		"teams": teams,
 	})
 } 
+
+func (h *PlayerHandler) GetPlayerRushingStats(c *gin.Context) {
+	playerName := c.Param("player")
+	
+	// Validate player name
+	if strings.TrimSpace(playerName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Player name is required",
+		})
+		return
+	}
+
+	// Gin automatically URL-decodes the parameter, so "James%20Connor" becomes "James Connor"
+	stats, err := database.GetPlayerRushingStats(h.db, playerName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve player rushing stats",
+			"details": err.Error(),
+		})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"stats":  stats,
+	})
+}

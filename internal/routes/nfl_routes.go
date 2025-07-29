@@ -14,7 +14,8 @@ func SetupNFLRoutes(router *gin.RouterGroup, db *sql.DB) {
 	// NFL routes
 	nfl := router.Group("/nfl")
 	{
-		nfl.GET("/players/:team", playerHandler.GetPlayersByTeam)
 		nfl.GET("/teams", playerHandler.GetAllTeams)
+		nfl.GET("/teams/:team/players", playerHandler.GetPlayersByTeam)
+		nfl.GET("/players/:player/rushing-stats", playerHandler.GetPlayerRushingStats)
 	}
 } 

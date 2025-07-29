@@ -9,11 +9,11 @@ import (
 // NFL Database operations
 
 // GetPlayersByTeam retrieves all players for a given NFL team
-func GetPlayersByTeam(db *sql.DB, teamName string) ([]models.Player, error) {
+func GetPlayersByTeam(db *sql.DB, teamName string) ([]models.NFLPlayer, error) {
 	query := `
-		SELECT player_id, player_name, position, team_name, team_id 
+		SELECT player_name, position
 		FROM nfl_data.nfl_roster_db 
-		WHERE LOWER(team_name) = LOWER(?) 
+		WHERE team_name = ? 
 		ORDER BY player_name
 	`
 
@@ -23,10 +23,10 @@ func GetPlayersByTeam(db *sql.DB, teamName string) ([]models.Player, error) {
 	}
 	defer rows.Close()
 
-	var players []models.Player
+	var players []models.NFLPlayer
 	for rows.Next() {
-		var player models.Player
-		err := rows.Scan(&player.PlayerID, &player.PlayerName, &player.Position, &player.TeamName, &player.TeamID)
+		var player models.NFLPlayer
+		err := rows.Scan(&player.PlayerName, &player.Position)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan player row: %w", err)
 		}
@@ -70,3 +70,58 @@ func GetAllTeams(db *sql.DB) ([]string, error) {
 
 	return teams, nil
 } 
+
+func GetPlayerRushingStats(db *sql.DB, playerName string) (models.NFLPlayerRushingStats, error) {
+	query := `
+		SELECT 
+			avgGain, longRushing, netTotalYards, netYardsPerGame,
+			rushingAttempts, rushingBigPlays, rushingFirstDowns, rushingFumbles,
+			rushingFumblesLost, rushingTouchdowns, rushingYards, rushingYardsPerGame,
+			stuffs, stuffYardsLost, teamGamesPlayed, totalOffensivePlays,
+			totalPointsPerGame, totalTouchdowns, totalYards, totalYardsFromScrimmage,
+			twoPointRushConvs, twoPtRush, twoPtRushAttempts,
+			yardsFromScrimmagePerGame, yardsPerGame, yardsPerRushAttempt,
+			player_name
+		FROM nfl_data.nfl_rushing_db
+		WHERE player_name = ?
+	`
+
+	var playerRushingStats models.NFLPlayerRushingStats
+	err := db.QueryRow(query, playerName).Scan(
+		&playerRushingStats.AvgGain,
+		&playerRushingStats.LongRushing,
+		&playerRushingStats.NetTotalYards,
+		&playerRushingStats.NetYardsPerGame,
+		&playerRushingStats.RushingAttempts,
+		&playerRushingStats.RushingBigPlays,
+		&playerRushingStats.RushingFirstDowns,
+		&playerRushingStats.RushingFumbles,
+		&playerRushingStats.RushingFumblesLost,
+		&playerRushingStats.RushingTouchdowns,
+		&playerRushingStats.RushingYards,
+		&playerRushingStats.RushingYardsPerGame,
+		&playerRushingStats.Stuffs,
+		&playerRushingStats.StuffYardsLost,
+		&playerRushingStats.TeamGamesPlayed,
+		&playerRushingStats.TotalOffensivePlays,
+		&playerRushingStats.TotalPointsPerGame,
+		&playerRushingStats.TotalTouchdowns,
+		&playerRushingStats.TotalYards,
+		&playerRushingStats.TotalYardsFromScrimmage,
+		&playerRushingStats.TwoPointRushConvs,
+		&playerRushingStats.TwoPtRush,
+		&playerRushingStats.TwoPtRushAttempts,
+		&playerRushingStats.YardsFromScrimmagePerGame,
+		&playerRushingStats.YardsPerGame,
+		&playerRushingStats.YardsPerRushAttempt,
+		&playerRushingStats.PlayerName,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.NFLPlayerRushingStats{}, fmt.Errorf("no rushing stats found for player: %s", playerName)
+		}
+		return models.NFLPlayerRushingStats{}, fmt.Errorf("failed to scan rushing stats row: %w", err)
+	}
+
+	return playerRushingStats, nil
+}

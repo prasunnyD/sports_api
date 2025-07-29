@@ -47,7 +47,6 @@ func GetNBATeams(db *sql.DB) ([]models.Team, error) {
 	query := `
 		SELECT DISTINCT TeamID, NICKNAME, NICKNAME, TeamID 
 		FROM nba_data.team_roster 
-		ORDER BY NICKNAME
 	`
 
 	rows, err := db.Query(query)

@@ -149,3 +149,38 @@ type APIResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 	Error   string      `json:"error,omitempty"`
 } 
+
+type NFLPlayer struct {
+	PlayerName string `json:"player_name"`
+	Position   string `json:"position"`
+}
+
+type NFLPlayerRushingStats struct {
+	AvgGain                  float64 `json:"avgGain"`
+	LongRushing              int     `json:"longRushing"`
+	NetTotalYards            int     `json:"netTotalYards"`
+	NetYardsPerGame          float64 `json:"netYardsPerGame"`
+	RushingAttempts          int     `json:"rushingAttempts"`
+	RushingBigPlays          int     `json:"rushingBigPlays"`
+	RushingFirstDowns        int     `json:"rushingFirstDowns"`
+	RushingFumbles           int     `json:"rushingFumbles"`
+	RushingFumblesLost       int     `json:"rushingFumblesLost"`
+	RushingTouchdowns        int     `json:"rushingTouchdowns"`
+	RushingYards             int     `json:"rushingYards"`
+	RushingYardsPerGame      float64 `json:"rushingYardsPerGame"`
+	Stuffs                   int     `json:"stuffs"`
+	StuffYardsLost           int     `json:"stuffYardsLost"`
+	TeamGamesPlayed          int     `json:"teamGamesPlayed"`
+	TotalOffensivePlays      int     `json:"totalOffensivePlays"`
+	TotalPointsPerGame       float64 `json:"totalPointsPerGame"`
+	TotalTouchdowns          int     `json:"totalTouchdowns"`
+	TotalYards               int     `json:"totalYards"`
+	TotalYardsFromScrimmage  int     `json:"totalYardsFromScrimmage"`
+	TwoPointRushConvs        int     `json:"twoPointRushConvs"`
+	TwoPtRush                int     `json:"twoPtRush"`
+	TwoPtRushAttempts        int     `json:"twoPtRushAttempts"`
+	YardsFromScrimmagePerGame float64 `json:"yardsFromScrimmagePerGame"`
+	YardsPerGame             float64 `json:"yardsPerGame"`
+	YardsPerRushAttempt      float64 `json:"yardsPerRushAttempt"`
+	PlayerName               string  `json:"player_name"`
+}
