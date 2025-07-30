@@ -94,3 +94,30 @@ func (h *PlayerHandler) GetPlayerRushingStats(c *gin.Context) {
 		"stats":  stats,
 	})
 }
+
+func (h *PlayerHandler) GetPlayerReceivingStats(c *gin.Context) {
+	playerName := c.Param("player")
+	
+	// Validate player name
+	if strings.TrimSpace(playerName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Player name is required",
+		})
+		return
+	}
+
+	// Gin automatically URL-decodes the parameter, so "James%20Connor" becomes "James Connor"
+	stats, err := database.GetPlayerReceivingStats(h.db, playerName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve player receiving stats",
+			"details": err.Error(),
+		})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"stats":  stats,
+	})
+}

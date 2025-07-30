@@ -184,3 +184,34 @@ type NFLPlayerRushingStats struct {
 	YardsPerRushAttempt      float64 `json:"yardsPerRushAttempt"`
 	PlayerName               string  `json:"player_name"`
 }
+
+type NFLPlayerReceivingStats struct {
+	AvgGain                   float64 `json:"avgGain"`
+	LongReception             int     `json:"longReception"`
+	NetTotalYards             int     `json:"netTotalYards"`
+	NetYardsPerGame           float64 `json:"netYardsPerGame"`
+	ReceivingBigPlays         int     `json:"receivingBigPlays"`
+	ReceivingFirstDowns       int     `json:"receivingFirstDowns"`
+	ReceivingFumbles          int     `json:"receivingFumbles"`
+	ReceivingFumblesLost      int     `json:"receivingFumblesLost"`
+	ReceivingTargets          int     `json:"receivingTargets"`
+	ReceivingTouchdowns       int     `json:"receivingTouchdowns"`
+	ReceivingYards            int     `json:"receivingYards"`
+	ReceivingYardsAfterCatch  int     `json:"receivingYardsAfterCatch"`
+	ReceivingYardsAtCatch     int     `json:"receivingYardsAtCatch"`
+	ReceivingYardsPerGame     float64 `json:"receivingYardsPerGame"`
+	Receptions                int     `json:"receptions"`
+	TeamGamesPlayed           int     `json:"teamGamesPlayed"`
+	TotalOffensivePlays       int     `json:"totalOffensivePlays"`
+	TotalPointsPerGame        float64 `json:"totalPointsPerGame"`
+	TotalTouchdowns           int     `json:"totalTouchdowns"`
+	TotalYards                int     `json:"totalYards"`
+	TotalYardsFromScrimmage   int     `json:"totalYardsFromScrimmage"`
+	TwoPointRecConvs          int     `json:"twoPointRecConvs"`
+	TwoPtReception            int     `json:"twoPtReception"`
+	TwoPtReceptionAttempts    int     `json:"twoPtReceptionAttempts"`
+	YardsFromScrimmagePerGame float64 `json:"yardsFromScrimmagePerGame"`
+	YardsPerGame              float64 `json:"yardsPerGame"`
+	YardsPerReception         float64 `json:"yardsPerReception"`
+	PlayerName                string  `json:"player_name"`
+}

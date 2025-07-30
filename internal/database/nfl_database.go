@@ -125,3 +125,80 @@ func GetPlayerRushingStats(db *sql.DB, playerName string) (models.NFLPlayerRushi
 
 	return playerRushingStats, nil
 }
+
+
+func GetPlayerReceivingStats(db *sql.DB, playerName string) (models.NFLPlayerReceivingStats, error) {
+	query := `
+		SELECT 
+			avgGain,
+			longReception,
+			netTotalYards,
+			netYardsPerGame,
+			receivingBigPlays,
+			receivingFirstDowns,
+			receivingFumbles,
+			receivingFumblesLost,
+			receivingTargets,
+			receivingTouchdowns,
+			receivingYards,
+			receivingYardsAfterCatch,
+			receivingYardsAtCatch,
+			receivingYardsPerGame,
+			receptions,
+			teamGamesPlayed,
+			totalOffensivePlays,
+			totalPointsPerGame,
+			totalTouchdowns,
+			totalYards,
+			totalYardsFromScrimmage,
+			twoPointRecConvs,
+			twoPtReception,
+			twoPtReceptionAttempts,
+			yardsFromScrimmagePerGame,
+			yardsPerGame,
+			yardsPerReception,
+			player_name
+		FROM nfl_data.nfl_receiving_db
+		WHERE player_name = ?
+	`
+
+	var playerReceivingStats models.NFLPlayerReceivingStats
+	err := db.QueryRow(query, playerName).Scan(
+		&playerReceivingStats.AvgGain,
+		&playerReceivingStats.LongReception,
+		&playerReceivingStats.NetTotalYards,
+		&playerReceivingStats.NetYardsPerGame,
+		&playerReceivingStats.ReceivingBigPlays,
+		&playerReceivingStats.ReceivingFirstDowns,
+		&playerReceivingStats.ReceivingFumbles,
+		&playerReceivingStats.ReceivingFumblesLost,
+		&playerReceivingStats.ReceivingTargets,
+		&playerReceivingStats.ReceivingTouchdowns,
+		&playerReceivingStats.ReceivingYards,
+		&playerReceivingStats.ReceivingYardsAfterCatch,
+		&playerReceivingStats.ReceivingYardsAtCatch,
+		&playerReceivingStats.ReceivingYardsPerGame,
+		&playerReceivingStats.Receptions,
+		&playerReceivingStats.TeamGamesPlayed,
+		&playerReceivingStats.TotalOffensivePlays,
+		&playerReceivingStats.TotalPointsPerGame,
+		&playerReceivingStats.TotalTouchdowns,
+		&playerReceivingStats.TotalYards,
+		&playerReceivingStats.TotalYardsFromScrimmage,
+		&playerReceivingStats.TwoPointRecConvs,
+		&playerReceivingStats.TwoPtReception,
+		&playerReceivingStats.TwoPtReceptionAttempts,
+		&playerReceivingStats.YardsFromScrimmagePerGame,
+		&playerReceivingStats.YardsPerGame,
+		&playerReceivingStats.YardsPerReception,
+		&playerReceivingStats.PlayerName,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.NFLPlayerReceivingStats{}, fmt.Errorf("no receiving stats found for player: %s", playerName)
+		}
+		return models.NFLPlayerReceivingStats{}, fmt.Errorf("failed to scan receiving stats row: %w", err)
+	}
+
+	return playerReceivingStats, nil
+}
