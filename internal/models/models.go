@@ -215,3 +215,36 @@ type NFLPlayerReceivingStats struct {
 	YardsPerReception         float64 `json:"yardsPerReception"`
 	PlayerName                string  `json:"player_name"`
 }
+
+type NFLEvent struct {
+	EventID   string `json:"event_id"`
+	EventDate string `json:"event_date"`
+	EventWeek int    `json:"event_week"`
+}
+
+type NFLPlayerGamelogStats struct {
+	GameID string `json:"game_id"`
+	PlayerName string `json:"player_name"`
+	GameDate string `json:"game_date"`
+	GameWeek string `json:"game_week"`
+	RushingAttempts string `json:"rushingAttempts"`
+	YardsPerRushAttempt string `json:"yardsPerRushAttempt"`
+	RushingYards string `json:"rushingYards"`
+	RushingTouchdowns string `json:"rushingTouchdowns"`
+	LongRushing string `json:"longRushing"`
+	Receptions string `json:"receptions"`
+	ReceivingTargets string `json:"receivingTargets"`
+	ReceivingYards string `json:"receivingYards"`
+	YardsPerReception string `json:"yardsPerReception"`
+	ReceivingTouchdowns string `json:"receivingTouchdowns"`
+	LongReception string `json:"longReception"`
+	Fumbles string `json:"fumbles"`
+	FumblesLost string `json:"fumblesLost"`
+	FumblesForced string `json:"fumblesForced"`
+	KicksBlocked string `json:"kicksBlocked"`
+}
+
+type NFLPlayerGamelogCollection struct {
+	PlayerName string `json:"player_name"`
+	Games []NFLPlayerGamelogStats `json:"games"`
+}

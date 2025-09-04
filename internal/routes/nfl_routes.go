@@ -18,5 +18,6 @@ func SetupNFLRoutes(router *gin.RouterGroup, db *sql.DB) {
 		nfl.GET("/team-roster/:team", playerHandler.GetPlayersByTeam)
 		nfl.GET("/players/:player/rushing-stats", playerHandler.GetPlayerRushingStats)
 		nfl.GET("/players/:player/receiving-stats", playerHandler.GetPlayerReceivingStats)
+		nfl.GET("/players/:player/game-stats", playerHandler.GetRushingGameStats)
 	}
 } 

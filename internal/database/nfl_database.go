@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sports_api/internal/models"
+	"log/slog"
 )
 
 // NFL Database operations
@@ -201,4 +202,74 @@ func GetPlayerReceivingStats(db *sql.DB, playerName string) (models.NFLPlayerRec
 	}
 
 	return playerReceivingStats, nil
+}
+
+func GetEvents(db *sql.DB, eventType string) (models.NFLEvent, error) {
+	query := `
+		SELECT 
+			event_id,
+			event_date,
+			event_week
+		FROM nfl_data.nfl_game_events_db
+	`
+	var events models.NFLEvent
+	err := db.QueryRow(query).Scan(
+		&events.EventID,
+		&events.EventDate,
+		&events.EventWeek,
+	)
+	if err != nil {
+		return models.NFLEvent{}, fmt.Errorf("failed to scan event row: %w", err)
+	}
+	return events, nil
+}
+
+func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelogCollection, error) {
+	slog.Debug("Getting rushing game stats for player: %s", playerName)
+	query := `
+		select distinct gl.game_id, gl.player_name, gl.rushingAttempts, gl.rushingYards, gl.rushingTouchdowns, gl.longRushing, gl.receptions, gl.receivingTargets, gl.receivingYards, gl.yardsPerReception, gl.receivingTouchdowns, gl.longReception, gl.fumbles, gl.fumblesLost, gl.fumblesForced, gl.kicksBlocked, e.game_date, e.game_week 
+		from nfl_data.nfl_rb_gamelog gl 
+		join nfl_data.nfl_games e on e.game_id = gl.game_id 
+		where gl.player_name = ?`
+
+	rows, err := db.Query(query, playerName)
+	if err != nil {
+		return models.NFLPlayerGamelogCollection{}, fmt.Errorf("failed to query gamelog stats: %w", err)
+	}
+	defer rows.Close()
+	var games []models.NFLPlayerGamelogStats
+	for rows.Next() {
+		var game models.NFLPlayerGamelogStats
+		err := rows.Scan(
+			&game.GameID,
+			&game.PlayerName,
+			&game.RushingAttempts,
+			&game.RushingYards,
+			&game.RushingTouchdowns,
+			&game.LongRushing,
+			&game.Receptions,
+			&game.ReceivingTargets,
+			&game.ReceivingYards,
+			&game.YardsPerReception,
+			&game.ReceivingTouchdowns,
+			&game.LongReception,
+			&game.Fumbles,
+			&game.FumblesLost,
+			&game.FumblesForced,
+			&game.KicksBlocked,
+			&game.GameDate,
+			&game.GameWeek,
+		)
+		if err != nil {
+			return models.NFLPlayerGamelogCollection{}, fmt.Errorf("failed to scan gamelog stats row: %w", err)
+		}
+		games = append(games, game)
+	}
+	if err = rows.Err(); err != nil {
+		return models.NFLPlayerGamelogCollection{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
+	}
+	return models.NFLPlayerGamelogCollection {
+		PlayerName: playerName,
+		Games: games,
+	}, nil
 }
