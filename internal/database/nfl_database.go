@@ -17,7 +17,7 @@ func GetPlayersByTeam(db *sql.DB, teamName string) ([]models.NFLPlayer, error) {
 		WHERE team_name = ? 
 		ORDER BY player_name
 	`
-
+	fmt.Printf("Getting players by team: %s\n", teamName)
 	rows, err := db.Query(query, teamName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query players: %w", err)
@@ -269,7 +269,52 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 		return models.NFLPlayerGamelogCollection{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
 	}
 	return models.NFLPlayerGamelogCollection {
-		PlayerName: playerName,
 		Games: games,
 	}, nil
+}
+
+func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseStats, error) {
+	query := `
+		select 
+			team_name,
+			yardsAllowed,
+			pointsAllowed,
+			totalTackles,
+			tacklesForLoss,
+			stuffs,
+			stuffYards,
+			avgStuffYards,
+			sacks,
+			sackYards,
+			avgSackYards,
+			passesDefended,
+			passesBattedDown,
+			hurries,
+			defensiveTouchdowns
+		from nfl_data.nfl_team_defensive_stats_db
+		where team_name = ?
+	`
+
+	var teamDefenseStats models.NFLTeamDefenseStats
+	err := db.QueryRow(query, teamName).Scan(
+		&teamDefenseStats.TeamName,
+		&teamDefenseStats.YardsAllowed,
+		&teamDefenseStats.PointsAllowed,
+		&teamDefenseStats.TotalTackles,
+		&teamDefenseStats.TacklesForLoss,
+		&teamDefenseStats.Stuffs,
+		&teamDefenseStats.StuffYards,
+		&teamDefenseStats.AvgStuffYards,
+		&teamDefenseStats.Sacks,
+		&teamDefenseStats.SackYards,
+		&teamDefenseStats.AvgSackYards,
+		&teamDefenseStats.PassesDefended,
+		&teamDefenseStats.PassesBattedDown,
+		&teamDefenseStats.Hurries,
+		&teamDefenseStats.DefensiveTouchdowns,
+	)
+	if err != nil {
+		return models.NFLTeamDefenseStats{}, fmt.Errorf("failed to scan team defense stats row: %w", err)
+	}
+	return teamDefenseStats, nil
 }

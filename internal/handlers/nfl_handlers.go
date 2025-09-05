@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strings"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 	"sports_api/internal/database"
@@ -124,7 +125,7 @@ func (h *PlayerHandler) GetPlayerReceivingStats(c *gin.Context) {
 
 func (h *PlayerHandler) GetRushingGameStats(c *gin.Context) {
 	playerName := c.Param("player")
-	
+	slog.Info("Getting rushing game stats for player: %s", playerName)
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -143,5 +144,19 @@ func (h *PlayerHandler) GetRushingGameStats(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
 		"stats":  stats,
+	})
+}
+
+func (h *PlayerHandler) GetTeamDefenseStats(c *gin.Context) {
+	teamName := c.Param("team")
+	stats, err := database.GetNFLTeamDefenseStats(h.db, teamName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve team defense stats",
+			"details": err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"stats": stats,
 	})
 }

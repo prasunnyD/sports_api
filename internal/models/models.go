@@ -245,6 +245,23 @@ type NFLPlayerGamelogStats struct {
 }
 
 type NFLPlayerGamelogCollection struct {
-	PlayerName string `json:"player_name"`
 	Games []NFLPlayerGamelogStats `json:"games"`
+}
+
+type NFLTeamDefenseStats struct {
+	TeamName string `json:"team_name"`
+	YardsAllowed string `json:"yardsAllowed"`
+	PointsAllowed string `json:"pointsAllowed"`
+	TotalTackles string `json:"totalTackles"`
+	TacklesForLoss string `json:"tacklesForLoss"`
+	Stuffs string `json:"stuffs"`
+	StuffYards string `json:"stuffYards"`
+	AvgStuffYards string `json:"avgStuffYards"`
+	Sacks string `json:"sacks"`
+	SackYards string `json:"sackYards"`
+	AvgSackYards string `json:"avgSackYards"`
+	PassesDefended string `json:"passesDefended"`
+	PassesBattedDown string `json:"passesBattedDown"`
+	Hurries string `json:"hurries"`
+	DefensiveTouchdowns string `json:"defensiveTouchdowns"`
 }
