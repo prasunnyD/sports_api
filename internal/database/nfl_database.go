@@ -227,8 +227,8 @@ func GetEvents(db *sql.DB, eventType string) (models.NFLEvent, error) {
 func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelogCollection, error) {
 	slog.Debug("Getting rushing game stats for player: %s", playerName)
 	query := `
-		select distinct gl.game_id, gl.player_name, gl.rushingAttempts, gl.rushingYards, gl.rushingTouchdowns, gl.longRushing, gl.receptions, gl.receivingTargets, gl.receivingYards, gl.yardsPerReception, gl.receivingTouchdowns, gl.longReception, gl.fumbles, gl.fumblesLost, gl.fumblesForced, gl.kicksBlocked, e.game_date, e.game_week 
-		from nfl_data.nfl_rb_gamelog gl 
+		select distinct gl.game_id, gl.player_name, gl.rushingAttempts, gl.rushingYards, gl.rushingTouchdowns, gl.longRushing, gl.receptions, gl.receivingTargets, gl.receivingYards, gl.yardsPerReception, gl.receivingTouchdowns, gl.longReception, gl.fumbles, gl.fumblesLost, e.game_date, e.game_week 
+		from nfl_data.nfl_player_gamelog gl 
 		join nfl_data.nfl_games e on e.game_id = gl.game_id 
 		where gl.player_name = ?`
 
@@ -255,8 +255,6 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 			&game.LongReception,
 			&game.Fumbles,
 			&game.FumblesLost,
-			&game.FumblesForced,
-			&game.KicksBlocked,
 			&game.GameDate,
 			&game.GameWeek,
 		)
