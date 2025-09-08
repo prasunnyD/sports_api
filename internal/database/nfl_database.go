@@ -128,6 +128,52 @@ func GetPlayerRushingStats(db *sql.DB, playerName string) (models.NFLPlayerRushi
 }
 
 
+func GetPlayerPassingStats(db *sql.DB, playerName string) (models.NFLPlayerPassingStats, error) {
+	query := `
+		SELECT 
+			avgGain,
+			completionPct,
+			completions,
+			interceptionPct,
+			interceptions,
+			longPassing,
+			netPassingYards,
+			netPassingYardsPerGame,
+			netTotalYards,
+			netYardsPerGame,
+			passingAttempts,
+			totalOffensivePlays,
+			player_name
+		FROM nfl_data.nfl_passing_db
+		WHERE player_name = ?
+	`
+
+	var playerPassingStats models.NFLPlayerPassingStats
+	err := db.QueryRow(query, playerName).Scan(
+		&playerPassingStats.AvgGain,               // avgGain
+		&playerPassingStats.CompletionPct,         // completionPct
+		&playerPassingStats.Completions,           // completions
+		&playerPassingStats.InterceptionPct,       // interceptionPct
+		&playerPassingStats.Interceptions,         // interceptions
+		&playerPassingStats.LongPassing,           // longPassing
+		&playerPassingStats.NetPassingYards,       // netPassingYards
+		&playerPassingStats.NetPassingYardsPerGame,// netPassingYardsPerGame
+		&playerPassingStats.NetTotalYards,         // netTotalYards
+		&playerPassingStats.NetYardsPerGame,       // netYardsPerGame
+		&playerPassingStats.PassingAttempts,       // passingAttempts
+		&playerPassingStats.TotalOffensivePlays,   // totalOffensivePlays
+		&playerPassingStats.PlayerName,            // player_name
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.NFLPlayerPassingStats{}, fmt.Errorf("no passing stats found for player: %s", playerName)
+		}
+		return models.NFLPlayerPassingStats{}, fmt.Errorf("failed to scan passing stats row: %w", err)
+	}
+
+	return playerPassingStats, nil
+}
+
 func GetPlayerReceivingStats(db *sql.DB, playerName string) (models.NFLPlayerReceivingStats, error) {
 	query := `
 		SELECT 
@@ -224,7 +270,7 @@ func GetEvents(db *sql.DB, eventType string) (models.NFLEvent, error) {
 	return events, nil
 }
 
-func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelogCollection, error) {
+func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats], error) {
 	slog.Debug("Getting rushing game stats for player: %s", playerName)
 	query := `
 		select distinct gl.game_id, gl.player_name, gl.rushingAttempts, gl.rushingYards, gl.rushingTouchdowns, gl.longRushing, gl.receptions, gl.receivingTargets, gl.receivingYards, gl.yardsPerReception, gl.receivingTouchdowns, gl.longReception, gl.fumbles, gl.fumblesLost, e.game_date, e.game_week 
@@ -234,12 +280,12 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 
 	rows, err := db.Query(query, playerName)
 	if err != nil {
-		return models.NFLPlayerGamelogCollection{}, fmt.Errorf("failed to query gamelog stats: %w", err)
+		return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats]{}, fmt.Errorf("failed to query gamelog stats: %w", err)
 	}
 	defer rows.Close()
-	var games []models.NFLPlayerGamelogStats
+	var games []models.NFLPlayerRushingReceivingGamelogStats
 	for rows.Next() {
-		var game models.NFLPlayerGamelogStats
+		var game models.NFLPlayerRushingReceivingGamelogStats
 		err := rows.Scan(
 			&game.GameID,
 			&game.PlayerName,
@@ -259,14 +305,78 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 			&game.GameWeek,
 		)
 		if err != nil {
-			return models.NFLPlayerGamelogCollection{}, fmt.Errorf("failed to scan gamelog stats row: %w", err)
+			return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats]{}, fmt.Errorf("failed to scan gamelog stats row: %w", err)
 		}
 		games = append(games, game)
 	}
 	if err = rows.Err(); err != nil {
-		return models.NFLPlayerGamelogCollection{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
+		return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats]{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
 	}
-	return models.NFLPlayerGamelogCollection {
+	return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats] {
+		Games: games,
+	}, nil
+}
+
+func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats], error) {
+	slog.Debug("Getting passing game stats for player: %s", playerName)
+	query := `
+		SELECT DISTINCT
+			gl.game_id,
+			gl.player_name,
+			gl.rushingAttempts,
+			gl.rushingYards,
+			gl.rushingTouchdowns,
+			gl.longRushing,
+			gl.yardsPerRushAttempt,
+			gl.passingAttempts,
+			gl.completions,
+			gl.passingYards,
+			gl.passingTouchdowns,
+			gl.interceptions,
+			gl.QBRating,
+			gl.yardsPerPassAttempt,
+			e.game_date,
+			e.game_week
+		FROM nfl_data.nfl_player_gamelog gl
+		JOIN nfl_data.nfl_games e ON e.game_id = gl.game_id
+		WHERE gl.player_name = ?
+	`
+
+	rows, err := db.Query(query, playerName)
+	if err != nil {
+		return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats]{}, fmt.Errorf("failed to query gamelog stats: %w", err)
+	}
+	defer rows.Close()
+	var games []models.NFLPlayerPassingGamelogStats
+	for rows.Next() {
+		var game models.NFLPlayerPassingGamelogStats
+		err := rows.Scan(
+			&game.GameID,
+			&game.PlayerName,
+			&game.GameDate,
+			&game.GameWeek,
+			&game.RushingAttempts,
+			&game.YardsPerRushAttempt,
+			&game.RushingYards,
+			&game.RushingTouchdowns,
+			&game.LongRushing,
+			&game.PassingAttempts,
+			&game.PassingCompletions,
+			&game.PassingYards,
+			&game.PassingTouchdowns,
+			&game.Interceptions,
+			&game.QBRating,
+			&game.YardsPerPassAttempt,
+		)
+		if err != nil {
+			return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats]{}, fmt.Errorf("failed to scan gamelog stats row: %w", err)
+		}
+		games = append(games, game)
+	}
+	if err = rows.Err(); err != nil {
+		return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats]{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
+	}
+	return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats] {
 		Games: games,
 	}, nil
 }

@@ -216,13 +216,29 @@ type NFLPlayerReceivingStats struct {
 	PlayerName                string  `json:"player_name"`
 }
 
+type NFLPlayerPassingStats struct {
+	AvgGain                  float64 `json:"avgGain"`
+	CompletionPct            float64 `json:"completionPct"`
+	Completions              int     `json:"completions"`
+	InterceptionPct          float64 `json:"interceptionPct"`
+	Interceptions            int     `json:"interceptions"`
+	LongPassing              int     `json:"longPassing"`
+	NetPassingYards          int     `json:"netPassingYards"`
+	NetPassingYardsPerGame   float64 `json:"netPassingYardsPerGame"`
+	NetTotalYards            int     `json:"netTotalYards"`
+	NetYardsPerGame          float64 `json:"netYardsPerGame"`
+	PassingAttempts          int     `json:"passingAttempts"`
+	TotalOffensivePlays      int     `json:"totalOffensivePlays"`
+	PlayerName               string  `json:"player_name"`
+}
+
 type NFLEvent struct {
 	EventID   string `json:"event_id"`
 	EventDate string `json:"event_date"`
 	EventWeek int    `json:"event_week"`
 }
 
-type NFLPlayerGamelogStats struct {
+type NFLPlayerRushingReceivingGamelogStats struct {
 	GameID string `json:"game_id"`
 	PlayerName string `json:"player_name"`
 	GameDate string `json:"game_date"`
@@ -244,8 +260,28 @@ type NFLPlayerGamelogStats struct {
 	KicksBlocked string `json:"kicksBlocked"`
 }
 
-type NFLPlayerGamelogCollection struct {
-	Games []NFLPlayerGamelogStats `json:"games"`
+
+type NFLPlayerPassingGamelogStats struct {
+	GameID string `json:"game_id"`
+	PlayerName string `json:"player_name"`
+	GameDate string `json:"game_date"`
+	GameWeek string `json:"game_week"`
+	RushingAttempts string `json:"rushingAttempts"`
+	YardsPerRushAttempt string `json:"yardsPerRushAttempt"`
+	RushingYards string `json:"rushingYards"`
+	RushingTouchdowns string `json:"rushingTouchdowns"`
+	LongRushing string `json:"longRushing"`
+	PassingAttempts string `json:"passingAttempts"`
+	PassingCompletions string `json:"passingCompletions"`
+	PassingYards string `json:"passingYards"`
+	PassingTouchdowns string `json:"passingTouchdowns"`
+	Interceptions string `json:"interceptions"`
+	QBRating string `json:"QBRating"`
+	YardsPerPassAttempt string `json:"yardsPerPassAttempt"`
+}
+
+type NFLPlayerGamelogCollection[T any] struct {
+	Games []T `json:"games"`
 }
 
 type NFLTeamDefenseStats struct {

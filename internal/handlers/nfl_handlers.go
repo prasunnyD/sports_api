@@ -123,6 +123,33 @@ func (h *PlayerHandler) GetPlayerReceivingStats(c *gin.Context) {
 	})
 }
 
+func (h *PlayerHandler) GetPlayerPassingStats(c *gin.Context) {
+	playerName := c.Param("player")
+	
+	// Validate player name
+	if strings.TrimSpace(playerName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Player name is required",
+		})
+		return
+	}
+
+	// Gin automatically URL-decodes the parameter, so "James%20Connor" becomes "James Connor"
+	stats, err := database.GetPlayerPassingStats(h.db, playerName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve player passing stats",
+			"details": err.Error(),
+		})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"stats":  stats,
+	})
+}
+
 func (h *PlayerHandler) GetRushingGameStats(c *gin.Context) {
 	playerName := c.Param("player")
 	slog.Info("Getting rushing game stats for player: %s", playerName)
@@ -137,6 +164,30 @@ func (h *PlayerHandler) GetRushingGameStats(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to retrieve player rushing game stats",
+			"details": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"stats":  stats,
+	})
+}
+
+func (h *PlayerHandler) GetPassingGameStats(c *gin.Context) {
+	playerName := c.Param("player")
+	slog.Info("Getting passing game stats for player: %s", playerName)
+	// Validate player name
+	if strings.TrimSpace(playerName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Player name is required",
+		})
+	}
+
+	stats, err := database.GetPassingGameStats(h.db, playerName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve player passing game stats",
 			"details": err.Error(),
 		})
 		return
