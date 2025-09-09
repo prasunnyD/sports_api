@@ -142,6 +142,7 @@ func GetPlayerPassingStats(db *sql.DB, playerName string) (models.NFLPlayerPassi
 			netTotalYards,
 			netYardsPerGame,
 			passingAttempts,
+			passingYards,
 			totalOffensivePlays,
 			player_name
 		FROM nfl_data.nfl_passing_db
@@ -161,6 +162,7 @@ func GetPlayerPassingStats(db *sql.DB, playerName string) (models.NFLPlayerPassi
 		&playerPassingStats.NetTotalYards,         // netTotalYards
 		&playerPassingStats.NetYardsPerGame,       // netYardsPerGame
 		&playerPassingStats.PassingAttempts,       // passingAttempts
+		&playerPassingStats.PassingYards,          // passingYards
 		&playerPassingStats.TotalOffensivePlays,   // totalOffensivePlays
 		&playerPassingStats.PlayerName,            // player_name
 	)
@@ -273,10 +275,27 @@ func GetEvents(db *sql.DB, eventType string) (models.NFLEvent, error) {
 func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats], error) {
 	slog.Debug("Getting rushing game stats for player: %s", playerName)
 	query := `
-		select distinct gl.game_id, gl.player_name, gl.rushingAttempts, gl.rushingYards, gl.rushingTouchdowns, gl.longRushing, gl.receptions, gl.receivingTargets, gl.receivingYards, gl.yardsPerReception, gl.receivingTouchdowns, gl.longReception, gl.fumbles, gl.fumblesLost, e.game_date, e.game_week 
-		from nfl_data.nfl_player_gamelog gl 
-		join nfl_data.nfl_games e on e.game_id = gl.game_id 
-		where gl.player_name = ?`
+		SELECT DISTINCT
+			gl.game_id,
+			gl.player_name,
+			gl.rushingAttempts,
+			gl.rushingYards,
+			gl.rushingTouchdowns,
+			gl.longRushing,
+			gl.receptions,
+			gl.receivingTargets,
+			gl.receivingYards,
+			gl.yardsPerReception,
+			gl.receivingTouchdowns,
+			gl.longReception,
+			gl.fumbles,
+			gl.fumblesLost,
+			e.game_date,
+			e.game_week
+		FROM nfl_data.nfl_player_gamelog gl
+		JOIN nfl_data.nfl_games e ON e.game_id = gl.game_id
+		WHERE gl.player_name = ?
+	`
 
 	rows, err := db.Query(query, playerName)
 	if err != nil {
@@ -323,20 +342,20 @@ func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 		SELECT DISTINCT
 			gl.game_id,
 			gl.player_name,
+			e.game_date,
+			e.game_week,
 			gl.rushingAttempts,
+			gl.yardsPerRushAttempt,
 			gl.rushingYards,
 			gl.rushingTouchdowns,
 			gl.longRushing,
-			gl.yardsPerRushAttempt,
 			gl.passingAttempts,
 			gl.completions,
 			gl.passingYards,
 			gl.passingTouchdowns,
 			gl.interceptions,
 			gl.QBRating,
-			gl.yardsPerPassAttempt,
-			e.game_date,
-			e.game_week
+			gl.yardsPerPassAttempt
 		FROM nfl_data.nfl_player_gamelog gl
 		JOIN nfl_data.nfl_games e ON e.game_id = gl.game_id
 		WHERE gl.player_name = ?

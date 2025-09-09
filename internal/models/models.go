@@ -228,6 +228,7 @@ type NFLPlayerPassingStats struct {
 	NetTotalYards            int     `json:"netTotalYards"`
 	NetYardsPerGame          float64 `json:"netYardsPerGame"`
 	PassingAttempts          int     `json:"passingAttempts"`
+	PassingYards             int     `json:"passingYards"`
 	TotalOffensivePlays      int     `json:"totalOffensivePlays"`
 	PlayerName               string  `json:"player_name"`
 }
