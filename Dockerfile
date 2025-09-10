@@ -2,7 +2,7 @@
 FROM golang:1.24-alpine AS builder
 
 # Install git, ca-certificates, and build dependencies for DuckDB
-RUN apk add --no-cache git ca-certificates gcc musl-dev
+RUN apk add --no-cache git ca-certificates gcc musl-dev libstdc++
 
 # Set working directory
 WORKDIR /app
@@ -23,8 +23,8 @@ RUN go mod tidy && CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o sp
 # Final stage
 FROM alpine:latest
 
-# Install ca-certificates for HTTPS requests
-RUN apk --no-cache add ca-certificates
+# Install ca-certificates for HTTPS requests and libstdc++ for runtime
+RUN apk --no-cache add ca-certificates libstdc++
 
 # Create non-root user
 RUN addgroup -g 1001 -S appgroup && \
