@@ -19,7 +19,7 @@ type Team struct {
 }
 
 // GameStats represents player game statistics
-type GameStats struct {
+type NBAGameStats struct {
 	Points           float64 `json:"points"`
 	Assists          float64 `json:"assists"`
 	Rebounds         float64 `json:"rebounds"`
@@ -28,9 +28,9 @@ type GameStats struct {
 }
 
 // PlayerGameLog represents a player's game log entry
-type PlayerGameLog struct {
+type NBAPlayerGameLog struct {
 	GameDate string     `json:"game_date"`
-	Stats    GameStats  `json:"stats"`
+	Stats    NBAGameStats  `json:"stats"`
 }
 
 // TeamGameLog represents a team's game log entry
@@ -50,7 +50,7 @@ type Game struct {
 }
 
 // TeamDefenseStats represents team defensive statistics
-type TeamDefenseStats struct {
+type NBATeamDefenseStats struct {
 	TeamName           string  `json:"team_name"`
 	OppFgaRank         int     `json:"opp_fga_rank"`
 	OppFga             float64 `json:"opp_fga"`
@@ -66,6 +66,7 @@ type TeamDefenseStats struct {
 	OppAst             float64 `json:"opp_ast"`
 	OppFg3aRank        int     `json:"opp_fg3a_rank"`
 	OppFg3a            float64 `json:"opp_fg3a"`
+	OppFg3Pct          float64 `json:"opp_fg3_pct"`
 	DefRatingRank      int     `json:"def_rating_rank"`
 	DefRating          float64 `json:"def_rating"`
 	OppPtsPaintRank    int     `json:"opp_pts_paint_rank"`
@@ -81,7 +82,7 @@ type TeamDefenseStats struct {
 }
 
 // PlayerShootingSplits represents player shooting statistics
-type PlayerShootingSplits struct {
+type NBAPlayerShootingSplits struct {
 	PlayerName     string  `json:"player_name"`
 	Fg2a           float64 `json:"fg2a"`
 	Fg2m           float64 `json:"fg2m"`
@@ -98,7 +99,7 @@ type PlayerShootingSplits struct {
 }
 
 // PlayerHeadlineStats represents player headline statistics
-type PlayerHeadlineStats struct {
+type NBAPlayerHeadlineStats struct {
 	PlayerName string  `json:"player_name"`
 	Points     float64 `json:"points"`
 	Assists    float64 `json:"assists"`
