@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/marcboeker/go-duckdb"
+	_ "github.com/marcboeker/go-duckdb/v2"
 )
 
 // InitDB initializes the connection to MotherDuck
