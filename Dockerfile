@@ -1,8 +1,13 @@
 # Build stage
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24 AS builder
 
-# Install git, ca-certificates, and build dependencies for DuckDB
-RUN apk add --no-cache git ca-certificates gcc musl-dev libstdc++
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    ca-certificates \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -21,14 +26,15 @@ COPY . .
 RUN go mod tidy && CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o sports-api main.go
 
 # Final stage
-FROM alpine:latest
-
-# Install ca-certificates for HTTPS requests and libstdc++ for runtime
-RUN apk --no-cache add ca-certificates libstdc++
+FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup -s /bin/bash -m appuser
 
 # Set working directory
 WORKDIR /app
