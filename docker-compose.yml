@@ -4,7 +4,7 @@ services:
   sports-api:
     build: .
     ports:
-      - "80:80"  # Use port 80 (default HTTP port)
+      - "8080:80"  # Use port 80 (default HTTP port)
     environment:
       - MOTHERDUCK_TOKEN=${MOTHERDUCK_TOKEN}
       - PORT=80
