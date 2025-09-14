@@ -1,48 +1,20 @@
 version: '3.8'
 
 services:
-  nfl-api:
+  sports-api:
     build: .
     ports:
-      - "8080:8080"
+      - "80:80"  # Use port 80 (default HTTP port)
     environment:
       - MOTHERDUCK_TOKEN=${MOTHERDUCK_TOKEN}
-      - PORT=8080
+      - PORT=80
       - GIN_MODE=debug
     env_file:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/v1/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-    networks:
-      - nfl-network
-
-  nba-api:
-    build: .
-    ports:
-      - "8081:8081"
-    environment:
-      - MOTHERDUCK_TOKEN=${MOTHERDUCK_TOKEN}
-      - PORT=8081
-      - GIN_MODE=debug
-    env_file:
-      - .env
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/v1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    networks:
-      - nba-network
-
-networks:
-  nfl-network:
-    driver: bridge 
-  nba-network:
-    driver: bridge 
+      start_period: 40s 
