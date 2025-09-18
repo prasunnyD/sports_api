@@ -34,7 +34,11 @@ func main() {
 
 	// Add CORS middleware
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins: []string{
+			"http://localhost:8080",  
+			"https://www.sharpr-analytics.com", // Production www domain
+			"https://sharpr-analytics.com", // Production domain
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
