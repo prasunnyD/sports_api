@@ -38,6 +38,7 @@ func main() {
 			"http://localhost:8080",  
 			"https://www.sharpr-analytics.com", // Production www domain
 			"https://sharpr-analytics.com", // Production domain
+			"https://api.sharpr-analytics.com", // API domain itself
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
