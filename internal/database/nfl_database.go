@@ -278,22 +278,23 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 		SELECT DISTINCT
 			gl.game_id,
 			gl.player_name,
-			gl.rushingAttempts,
-			gl.rushingYards,
-			gl.rushingTouchdowns,
-			gl.longRushing,
-			gl.receptions,
-			gl.receivingTargets,
-			gl.receivingYards,
-			gl.yardsPerReception,
-			gl.receivingTouchdowns,
-			gl.longReception,
-			gl.fumbles,
-			gl.fumblesLost,
-			e.game_date,
-			e.game_week
+			COALESCE(gl.rushingAttempts::int, 0) as rushingAttempts,
+			COALESCE(gl.rushingYards::int, 0) as rushingYards,
+			COALESCE(gl.rushingTouchdowns::int, 0) as rushingTouchdowns,
+			COALESCE(gl.longRushing::int, 0) as longRushing,
+			COALESCE(gl.receptions::int, 0) as receptions,
+			COALESCE(gl.receivingTargets::int, 0) as receivingTargets,
+			COALESCE(gl.receivingYards::int, 0) as receivingYards,
+			COALESCE(gl.yardsPerReception::double, 0) as yardsPerReception,
+			COALESCE(gl.receivingTouchdowns::int, 0) as receivingTouchdowns,
+			COALESCE(gl.longReception::int, 0) as longReception,
+			COALESCE(gl.fumbles::int, 0) as fumbles,
+			COALESCE(gl.fumblesLost::int, 0) as fumblesLost,
+			gl.game_date,
+			gl.game_week,
+			COALESCE(gl.offense_snaps::int, 0) as offense_snaps,
+			COALESCE(gl.offense_snap_pct, 0) as offense_snap_pct,
 		FROM nfl_data.nfl_player_gamelog gl
-		JOIN nfl_data.nfl_games e ON e.game_id = gl.game_id
 		WHERE gl.player_name = ?
 	`
 
@@ -322,6 +323,8 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 			&game.FumblesLost,
 			&game.GameDate,
 			&game.GameWeek,
+			&game.OffenseSnaps,
+			&game.OffenseSnapPct,
 		)
 		if err != nil {
 			return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats]{}, fmt.Errorf("failed to scan gamelog stats row: %w", err)
@@ -342,22 +345,23 @@ func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 		SELECT DISTINCT
 			gl.game_id,
 			gl.player_name,
-			e.game_date,
-			e.game_week,
-			gl.rushingAttempts,
-			gl.yardsPerRushAttempt,
-			gl.rushingYards,
-			gl.rushingTouchdowns,
-			gl.longRushing,
-			gl.passingAttempts,
-			gl.completions,
-			gl.passingYards,
-			gl.passingTouchdowns,
-			gl.interceptions,
-			gl.QBRating,
-			gl.yardsPerPassAttempt
+			gl.game_date,
+			gl.game_week,
+			COALESCE(gl.offense_snaps::int, 0) as offense_snaps,
+			COALESCE(gl.offense_snap_pct, 0) as offense_snap_pct,
+			COALESCE(gl.rushingAttempts::int, 0) as rushingAttempts,
+			COALESCE(gl.yardsPerRushAttempt::int, 0) as yardsPerRushAttempt,
+			COALESCE(gl.rushingYards::int, 0) as rushingYards,
+			COALESCE(gl.rushingTouchdowns::int, 0) as rushingTouchdowns,
+			COALESCE(gl.longRushing::int, 0) as longRushing,
+			COALESCE(gl.passingAttempts::int, 0) as passingAttempts,
+			COALESCE(gl.completions::int, 0) as completions,
+			COALESCE(gl.passingYards::int, 0) as passingYards,
+			COALESCE(gl.passingTouchdowns::int, 0) as passingTouchdowns,
+			COALESCE(gl.interceptions::int, 0) as interceptions,
+			COALESCE(gl.QBRating::double, 0) as QBRating,
+			COALESCE(gl.yardsPerPassAttempt::double, 0) as yardsPerPassAttempt
 		FROM nfl_data.nfl_player_gamelog gl
-		JOIN nfl_data.nfl_games e ON e.game_id = gl.game_id
 		WHERE gl.player_name = ?
 	`
 
@@ -374,6 +378,8 @@ func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 			&game.PlayerName,
 			&game.GameDate,
 			&game.GameWeek,
+			&game.OffenseSnaps,
+			&game.OffenseSnapPct,
 			&game.RushingAttempts,
 			&game.YardsPerRushAttempt,
 			&game.RushingYards,

@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // Player represents an NBA player
 type Player struct {
 	PlayerID   string `json:"player_id"`
@@ -243,43 +245,45 @@ type NFLEvent struct {
 type NFLPlayerRushingReceivingGamelogStats struct {
 	GameID string `json:"game_id"`
 	PlayerName string `json:"player_name"`
-	GameDate string `json:"game_date"`
-	GameWeek string `json:"game_week"`
-	RushingAttempts string `json:"rushingAttempts"`
-	YardsPerRushAttempt string `json:"yardsPerRushAttempt"`
-	RushingYards string `json:"rushingYards"`
-	RushingTouchdowns string `json:"rushingTouchdowns"`
-	LongRushing string `json:"longRushing"`
-	Receptions string `json:"receptions"`
-	ReceivingTargets string `json:"receivingTargets"`
-	ReceivingYards string `json:"receivingYards"`
-	YardsPerReception string `json:"yardsPerReception"`
-	ReceivingTouchdowns string `json:"receivingTouchdowns"`
-	LongReception string `json:"longReception"`
-	Fumbles string `json:"fumbles"`
-	FumblesLost string `json:"fumblesLost"`
-	FumblesForced string `json:"fumblesForced"`
-	KicksBlocked string `json:"kicksBlocked"`
+	GameDate time.Time `json:"game_date"`
+	GameWeek int `json:"game_week"`
+	RushingAttempts int `json:"rushingAttempts"`
+	YardsPerRushAttempt float64 `json:"yardsPerRushAttempt"`
+	RushingYards int `json:"rushingYards"`
+	RushingTouchdowns int `json:"rushingTouchdowns"`
+	LongRushing int `json:"longRushing"`
+	Receptions int `json:"receptions"`
+	ReceivingTargets int `json:"receivingTargets"`
+	ReceivingYards int `json:"receivingYards"`
+	YardsPerReception float64 `json:"yardsPerReception"`
+	ReceivingTouchdowns int `json:"receivingTouchdowns"`
+	LongReception int `json:"longReception"`
+	Fumbles int `json:"fumbles"`
+	FumblesLost int `json:"fumblesLost"`
+	OffenseSnaps int `json:"offenseSnaps"`
+	OffenseSnapPct float64 `json:"offenseSnapPct"`
 }
 
 
 type NFLPlayerPassingGamelogStats struct {
 	GameID string `json:"game_id"`
 	PlayerName string `json:"player_name"`
-	GameDate string `json:"game_date"`
-	GameWeek string `json:"game_week"`
-	RushingAttempts string `json:"rushingAttempts"`
-	YardsPerRushAttempt string `json:"yardsPerRushAttempt"`
-	RushingYards string `json:"rushingYards"`
-	RushingTouchdowns string `json:"rushingTouchdowns"`
-	LongRushing string `json:"longRushing"`
-	PassingAttempts string `json:"passingAttempts"`
-	PassingCompletions string `json:"passingCompletions"`
-	PassingYards string `json:"passingYards"`
-	PassingTouchdowns string `json:"passingTouchdowns"`
-	Interceptions string `json:"interceptions"`
-	QBRating string `json:"QBRating"`
-	YardsPerPassAttempt string `json:"yardsPerPassAttempt"`
+	GameDate time.Time `json:"game_date"`
+	GameWeek int `json:"game_week"`
+	RushingAttempts int `json:"rushingAttempts"`
+	YardsPerRushAttempt float64 `json:"yardsPerRushAttempt"`
+	RushingYards int `json:"rushingYards"`
+	RushingTouchdowns int `json:"rushingTouchdowns"`
+	LongRushing int `json:"longRushing"`
+	PassingAttempts int `json:"passingAttempts"`
+	PassingCompletions int `json:"passingCompletions"`
+	PassingYards int `json:"passingYards"`
+	PassingTouchdowns int `json:"passingTouchdowns"`
+	Interceptions int `json:"interceptions"`
+	QBRating float64 `json:"QBRating"`
+	YardsPerPassAttempt float64 `json:"yardsPerPassAttempt"`
+	OffenseSnaps int `json:"offenseSnaps"`
+	OffenseSnapPct float64 `json:"offenseSnapPct"`
 }
 
 type NFLPlayerGamelogCollection[T any] struct {
