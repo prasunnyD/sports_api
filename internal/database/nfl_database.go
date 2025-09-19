@@ -410,20 +410,28 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 	query := `
 		select 
 			team_name,
-			yardsAllowed,
-			pointsAllowed,
 			totalTackles,
 			tacklesForLoss,
+			tacklesForLoss_rank,
 			stuffs,
+			stuffs_rank,
 			stuffYards,
 			avgStuffYards,
 			sacks,
+			sacks_rank,
 			sackYards,
 			avgSackYards,
 			passesDefended,
-			passesBattedDown,
+			passesDefended_rank,
 			hurries,
-			defensiveTouchdowns
+			epa_per_play_allowed,
+			success_rate_allowed,
+			rush_success_rate_allowed,
+			dropback_success_rate_allowed,
+			epa_per_play_allowed_rank,
+			success_rate_allowed_rank,
+			rush_success_rate_allowed_rank,
+			dropback_success_rate_allowed_rank
 		from nfl_data.nfl_team_defensive_stats_db
 		where team_name = ?
 	`
@@ -431,20 +439,28 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 	var teamDefenseStats models.NFLTeamDefenseStats
 	err := db.QueryRow(query, teamName).Scan(
 		&teamDefenseStats.TeamName,
-		&teamDefenseStats.YardsAllowed,
-		&teamDefenseStats.PointsAllowed,
 		&teamDefenseStats.TotalTackles,
 		&teamDefenseStats.TacklesForLoss,
+		&teamDefenseStats.TacklesForLossRank,
 		&teamDefenseStats.Stuffs,
+		&teamDefenseStats.StuffsRank,
 		&teamDefenseStats.StuffYards,
 		&teamDefenseStats.AvgStuffYards,
 		&teamDefenseStats.Sacks,
+		&teamDefenseStats.SacksRank,
 		&teamDefenseStats.SackYards,
 		&teamDefenseStats.AvgSackYards,
 		&teamDefenseStats.PassesDefended,
-		&teamDefenseStats.PassesBattedDown,
+		&teamDefenseStats.PassesDefendedRank,
 		&teamDefenseStats.Hurries,
-		&teamDefenseStats.DefensiveTouchdowns,
+		&teamDefenseStats.EPAperPlayAllowed,
+		&teamDefenseStats.SuccessRateAllowed,
+		&teamDefenseStats.RushSuccessRateAllowed,
+		&teamDefenseStats.DropbackSuccessRateAllowed,
+		&teamDefenseStats.EPAperPlayAllowedRank,
+		&teamDefenseStats.SuccessRateAllowedRank,
+		&teamDefenseStats.RushSuccessRateAllowedRank,
+		&teamDefenseStats.DropbackSuccessRateAllowedRank,
 	)
 	if err != nil {
 		return models.NFLTeamDefenseStats{}, fmt.Errorf("failed to scan team defense stats row: %w", err)

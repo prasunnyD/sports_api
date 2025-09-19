@@ -292,18 +292,26 @@ type NFLPlayerGamelogCollection[T any] struct {
 
 type NFLTeamDefenseStats struct {
 	TeamName string `json:"team_name"`
-	YardsAllowed string `json:"yardsAllowed"`
-	PointsAllowed string `json:"pointsAllowed"`
 	TotalTackles string `json:"totalTackles"`
 	TacklesForLoss string `json:"tacklesForLoss"`
-	Stuffs string `json:"stuffs"`
-	StuffYards string `json:"stuffYards"`
-	AvgStuffYards string `json:"avgStuffYards"`
-	Sacks string `json:"sacks"`
-	SackYards string `json:"sackYards"`
-	AvgSackYards string `json:"avgSackYards"`
-	PassesDefended string `json:"passesDefended"`
-	PassesBattedDown string `json:"passesBattedDown"`
-	Hurries string `json:"hurries"`
-	DefensiveTouchdowns string `json:"defensiveTouchdowns"`
+	TacklesForLossRank int `json:"tacklesForLoss_rank"`
+	Stuffs int `json:"stuffs"`
+	StuffsRank int `json:"stuffs_rank"`
+	StuffYards int `json:"stuffYards"`
+	AvgStuffYards float64 `json:"avgStuffYards"`
+	Sacks int `json:"sacks"`
+	SacksRank int `json:"sacks_rank"`
+	SackYards int `json:"sackYards"`
+	AvgSackYards float64 `json:"avgSackYards"`
+	PassesDefended int `json:"passesDefended"`
+	PassesDefendedRank int `json:"passesDefended_rank"`
+	Hurries int `json:"hurries"`
+	EPAperPlayAllowed float64 `json:"epa_per_play_allowed"`
+	SuccessRateAllowed string `json:"success_rate_allowed"`
+	RushSuccessRateAllowed string `json:"rush_success_rate_allowed"`
+	DropbackSuccessRateAllowed string `json:"dropback_success_rate_allowed"`
+	EPAperPlayAllowedRank string `json:"epa_per_play_allowed_rank"`
+	SuccessRateAllowedRank string `json:"success_rate_allowed_rank"`
+	RushSuccessRateAllowedRank string `json:"rush_success_rate_allowed_rank"`
+	DropbackSuccessRateAllowedRank string `json:"dropback_success_rate_allowed_rank"`
 }
