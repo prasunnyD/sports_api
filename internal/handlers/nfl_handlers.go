@@ -211,3 +211,18 @@ func (h *PlayerHandler) GetTeamDefenseStats(c *gin.Context) {
 		"stats": stats,
 	})
 }
+
+func (h *PlayerHandler) GetTeamOffenseStats(c *gin.Context) {
+	teamName := c.Param("team")
+	stats, err := database.GetNFLTeamOffenseStats(h.db, teamName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve team defense stats",
+			"details": err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"stats": stats,
+	})
+}
+

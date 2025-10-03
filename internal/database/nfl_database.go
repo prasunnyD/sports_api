@@ -467,3 +467,63 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 	}
 	return teamDefenseStats, nil
 }
+
+func GetNFLTeamOffenseStats(db *sql.DB, teamName string) (models.NFLTeamOffenseStats, error) {
+	query := `
+		select 
+			oa.team_name,
+			epa_per_play,
+			success_rate,
+			rush_success_rate,
+			dropback_success_rate,
+			epa_per_play_rank,
+			success_rate_rank,
+			rush_success_rate_rank,
+			dropback_success_rate_rank,
+			ps.passingYardsPerGame,
+			ps.passingYardsPerGame_rank,
+			ps.yardsPerCompletion,
+			ps.yardsPerCompletion_rank,
+			ps.sacks,
+			ps.sacks_rank,
+			rs.rushingAttempts,
+			rs.rushingAttempts_rank,
+			rs.yardsPerRushAttempt,
+			rs.yardsPerRushAttempt_rank,
+			ps.passingAttempts,
+			ps.passingAttempts_rank,
+		from nfl_data.nfl_team_offense_advanced_stats oa
+		join nfl_data.nfl_team_passing_stats_db ps on oa.team_name = ps.team_name
+		join nfl_data.nfl_team_rushing_stats_db rs on oa.team_name = rs.team_name
+		where oa.team_name = ?
+	`
+
+	var teamOffenseStats models.NFLTeamOffenseStats
+	err := db.QueryRow(query, teamName).Scan(
+		&teamOffenseStats.TeamName,
+		&teamOffenseStats.EPAperPlay,
+		&teamOffenseStats.SuccessRate,
+		&teamOffenseStats.RushSuccessRate,
+		&teamOffenseStats.DropbackSuccessRate,
+		&teamOffenseStats.EPAperPlayRank,
+		&teamOffenseStats.SuccessRateRank,
+		&teamOffenseStats.RushSuccessRateRank,
+		&teamOffenseStats.DropbackSuccessRateRank,
+		&teamOffenseStats.PassingYardsPerGame,
+		&teamOffenseStats.PassingYardsPerGameRank,
+		&teamOffenseStats.YardsPerCompletion,
+		&teamOffenseStats.YardsPerCompletionRank,
+		&teamOffenseStats.Sacks,
+		&teamOffenseStats.SacksRank,
+		&teamOffenseStats.RushingAttempts,
+		&teamOffenseStats.RushingAttemptsRank,
+		&teamOffenseStats.YardsPerRushAttempt,
+		&teamOffenseStats.YardsPerRushAttemptRank,
+		&teamOffenseStats.PassingAttempts,
+		&teamOffenseStats.PassingAttemptsRank,
+	)
+	if err != nil {
+		return models.NFLTeamOffenseStats{}, fmt.Errorf("failed to scan team offense stats row: %w", err)
+	}
+	return teamOffenseStats, nil
+}

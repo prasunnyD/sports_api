@@ -315,3 +315,27 @@ type NFLTeamDefenseStats struct {
 	RushSuccessRateAllowedRank string `json:"rush_success_rate_allowed_rank"`
 	DropbackSuccessRateAllowedRank string `json:"dropback_success_rate_allowed_rank"`
 }
+
+type NFLTeamOffenseStats struct {
+	TeamName string `json:"team_name"`
+	EPAperPlay float64 `json:"epa_per_play"`
+	SuccessRate string `json:"success_rate"`
+	RushSuccessRate string `json:"rush_success_rate"`
+	DropbackSuccessRate string `json:"dropback_success_rate"`
+	EPAperPlayRank int `json:"epa_per_play_rank"`
+	SuccessRateRank int `json:"success_rate_rank"`
+	RushSuccessRateRank int `json:"rush_success_rate_rank"`
+	DropbackSuccessRateRank int `json:"dropback_success_rate_rank"`
+	PassingYardsPerGame float64 `json:"passingYardsPerGame"`
+	PassingYardsPerGameRank int `json:"passingYardsPerGame_rank"`
+	YardsPerCompletion float64 `json:"yardsPerCompletion"`
+	YardsPerCompletionRank int `json:"yardsPerCompletion_rank"`
+	Sacks float64 `json:"sacks"`
+	SacksRank int `json:"sacks_rank"`
+	RushingAttempts float64 `json:"rushingAttempts"`
+	RushingAttemptsRank int `json:"rushingAttempts_rank"`
+	YardsPerRushAttempt float64 `json:"yardsPerRushAttempt"`
+	YardsPerRushAttemptRank int `json:"yardsPerRushAttempt_rank"`
+	PassingAttempts float64 `json:"passingAttempts"`
+	PassingAttemptsRank int `json:"passingAttempts_rank"`
+}
