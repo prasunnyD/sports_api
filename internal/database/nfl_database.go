@@ -292,9 +292,13 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 			COALESCE(gl.fumblesLost::int, 0) as fumblesLost,
 			gl.game_date,
 			gl.game_week,
-			COALESCE(gl.offense_snaps::int, 0) as offense_snaps,
-			COALESCE(gl.offense_snap_pct, 0) as offense_snap_pct,
+			COALESCE(ps.offense_snaps::int, 0) as offense_snaps,
+			COALESCE(ps.offense_snap_pct, 0) as offense_snap_pct,
 		FROM nfl_data.nfl_player_gamelog gl
+		JOIN nfl_data.nfl_player_snap_counts ps 
+				ON gl.player_id = ps.player_id 
+				AND gl.season = ps.season 
+				AND gl.game_week = ps.game_week
 		WHERE gl.player_name = ?
 	`
 
@@ -347,21 +351,26 @@ func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 			gl.player_name,
 			gl.game_date,
 			gl.game_week,
-			COALESCE(gl.offense_snaps::int, 0) as offense_snaps,
-			COALESCE(gl.offense_snap_pct, 0) as offense_snap_pct,
-			COALESCE(gl.rushingAttempts::int, 0) as rushingAttempts,
-			COALESCE(gl.yardsPerRushAttempt::int, 0) as yardsPerRushAttempt,
-			COALESCE(gl.rushingYards::int, 0) as rushingYards,
-			COALESCE(gl.rushingTouchdowns::int, 0) as rushingTouchdowns,
-			COALESCE(gl.longRushing::int, 0) as longRushing,
-			COALESCE(gl.passingAttempts::int, 0) as passingAttempts,
-			COALESCE(gl.completions::int, 0) as completions,
-			COALESCE(gl.passingYards::int, 0) as passingYards,
-			COALESCE(gl.passingTouchdowns::int, 0) as passingTouchdowns,
-			COALESCE(gl.interceptions::int, 0) as interceptions,
-			COALESCE(gl.QBRating::double, 0) as QBRating,
-			COALESCE(gl.yardsPerPassAttempt::double, 0) as yardsPerPassAttempt
-		FROM nfl_data.nfl_player_gamelog gl
+			COALESCE(ps.offense_snaps::int, 0)            AS offense_snaps,
+			COALESCE(ps.offense_snap_pct, 0)              AS offense_snap_pct,
+			COALESCE(gl.rushingAttempts::int, 0)          AS rushingAttempts,
+			COALESCE(gl.yardsPerRushAttempt::int, 0)      AS yardsPerRushAttempt,
+			COALESCE(gl.rushingYards::int, 0)             AS rushingYards,
+			COALESCE(gl.rushingTouchdowns::int, 0)        AS rushingTouchdowns,
+			COALESCE(gl.longRushing::int, 0)              AS longRushing,
+			COALESCE(gl.passingAttempts::int, 0)          AS passingAttempts,
+			COALESCE(gl.completions::int, 0)              AS completions,
+			COALESCE(gl.passingYards::int, 0)             AS passingYards,
+			COALESCE(gl.passingTouchdowns::int, 0)        AS passingTouchdowns,
+			COALESCE(gl.interceptions::int, 0)            AS interceptions,
+			COALESCE(gl.QBRating::double, 0)              AS QBRating,
+			COALESCE(gl.yardsPerPassAttempt::double, 0)   AS yardsPerPassAttempt
+		FROM 
+			nfl_data.nfl_qb_gamelog gl
+			JOIN nfl_data.nfl_player_snap_counts ps 
+				ON gl.player_id = ps.player_id 
+				AND gl.season = ps.season 
+				AND gl.game_week = ps.game_week
 		WHERE gl.player_name = ?
 	`
 
