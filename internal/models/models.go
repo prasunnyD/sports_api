@@ -108,6 +108,26 @@ type NBAPlayerHeadlineStats struct {
 	Rebounds   float64 `json:"rebounds"`
 }
 
+type NBAPlayerShotChartStats struct {
+	PlayerName      string `json:"player_name"`
+	ShotChart       string `json:"shot_chart"`
+	PlayerID        int    `json:"player_id"`
+	SeasonID        string `json:"season_id"`
+	GameID          string `json:"game_id"`
+	GameDate        string `json:"game_date"`
+	LocX            int    `json:"loc_x"`
+	LocY            int    `json:"loc_y"`
+	ShotMadeFlag    int    `json:"shot_made_flag"`
+	ShotZoneBasic   string `json:"shot_zone_basic"`
+	ShotZoneArea    string `json:"shot_zone_area"`
+	ActionType      string `json:"action_type"`
+	ShotType        string `json:"shot_type"`
+	ShotDistance    int    `json:"shot_distance"`
+	TeamID          int64  `json:"team_id"`
+	Opponent        string `json:"opponent"`
+	GameEventID     int    `json:"game_event_id"`
+}
+
 // PlayerModel represents the input for points prediction
 type PlayerModel struct {
 	OppCity string  `json:"opp_city"`
@@ -292,20 +312,8 @@ type NFLPlayerGamelogCollection[T any] struct {
 
 type NFLTeamDefenseStats struct {
 	TeamName string `json:"team_name"`
-	TotalTackles string `json:"totalTackles"`
-	TacklesForLoss string `json:"tacklesForLoss"`
-	TacklesForLossRank int `json:"tacklesForLoss_rank"`
-	Stuffs int `json:"stuffs"`
-	StuffsRank int `json:"stuffs_rank"`
-	StuffYards int `json:"stuffYards"`
-	AvgStuffYards float64 `json:"avgStuffYards"`
-	Sacks int `json:"sacks"`
-	SacksRank int `json:"sacks_rank"`
-	SackYards int `json:"sackYards"`
-	AvgSackYards float64 `json:"avgSackYards"`
-	PassesDefended int `json:"passesDefended"`
-	PassesDefendedRank int `json:"passesDefended_rank"`
-	Hurries int `json:"hurries"`
+	SacksRate string `json:"sacks_rate"`
+	SacksRateRank int `json:"sacks_rate_rank"`
 	EPAperPlayAllowed float64 `json:"epa_per_play_allowed"`
 	SuccessRateAllowed string `json:"success_rate_allowed"`
 	RushSuccessRateAllowed string `json:"rush_success_rate_allowed"`
@@ -314,6 +322,30 @@ type NFLTeamDefenseStats struct {
 	SuccessRateAllowedRank string `json:"success_rate_allowed_rank"`
 	RushSuccessRateAllowedRank string `json:"rush_success_rate_allowed_rank"`
 	DropbackSuccessRateAllowedRank string `json:"dropback_success_rate_allowed_rank"`
+	ExplosivePlayRateAllowed float64 `json:"explosive_play_rate_allowed"`
+	ExplosivePlayRateAllowedRank string `json:"explosive_play_rate_allowed_rank"`
+	PressureRate float64 `json:"pressure_rate"`
+	PressureRateRank string `json:"pressure_rate_rank"`
+	BlitzRate float64 `json:"blitz_rate"`
+	BlitzRateRank string `json:"blitz_rate_rank"`
+	ManRate float64 `json:"man_rate"`
+	ManRateRank string `json:"man_rate_rank"`
+	ZoneRate float64 `json:"zone_rate"`
+	ZoneRateRank string `json:"zone_rate_rank"`
+	RushStuffRate float64 `json:"rush_stuff_rate"`
+	RushStuffRateRank string `json:"rush_stuff_rate_rank"`
+	YardsBeforeContactPerRbRush float64 `json:"yards_before_contact_per_rb_rush"`
+	YardsBeforeContactPerRbRushRank string `json:"yards_before_contact_per_rb_rush_rank"`
+	DownConversionRateAllowed float64 `json:"down_conversion_rate_allowed"`
+	DownConversionRateAllowedRank string `json:"down_conversion_rate_allowed_rank"`
+	YardsPerPlayAllowed float64 `json:"yards_per_play_allowed"`
+	YardsPerPlayAllowedRank string `json:"yards_per_play_allowed_rank"`
+	Adot float64 `json:"adot"`
+	AdotRank string `json:"adot_rank"`
+	ScrambleRate string `json:"scramble_rate"`
+	ScrambleRateRank string `json:"scramble_rate_rank"`
+	IntRate string `json:"int_rate"`
+	IntRateRank string `json:"int_rate_rank"`
 }
 
 type NFLTeamOffenseStats struct {
@@ -330,7 +362,7 @@ type NFLTeamOffenseStats struct {
 	PassingYardsPerGameRank int `json:"passingYardsPerGame_rank"`
 	YardsPerCompletion float64 `json:"yardsPerCompletion"`
 	YardsPerCompletionRank int `json:"yardsPerCompletion_rank"`
-	Sacks float64 `json:"sacks"`
+	Sacks string `json:"sacks"`
 	SacksRank int `json:"sacks_rank"`
 	RushingAttempts float64 `json:"rushingAttempts"`
 	RushingAttemptsRank int `json:"rushingAttempts_rank"`
@@ -338,4 +370,10 @@ type NFLTeamOffenseStats struct {
 	YardsPerRushAttemptRank int `json:"yardsPerRushAttempt_rank"`
 	PassingAttempts float64 `json:"passingAttempts"`
 	PassingAttemptsRank int `json:"passingAttempts_rank"`
+	Adot float64 `json:"adot"`
+	AdotRank int `json:"adot_rank"`
+	ScrambleRate string `json:"scramble_rate"`
+	ScrambleRateRank int `json:"scramble_rate_rank"`
+	IntRate string `json:"int_rate"`
+	IntRateRank int `json:"int_rate_rank"`
 }

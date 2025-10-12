@@ -417,51 +417,57 @@ func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 
 func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseStats, error) {
 	query := `
-		select 
-			team_name,
-			totalTackles,
-			tacklesForLoss,
-			tacklesForLoss_rank,
-			stuffs,
-			stuffs_rank,
-			stuffYards,
-			avgStuffYards,
-			sacks,
-			sacks_rank,
-			sackYards,
-			avgSackYards,
-			passesDefended,
-			passesDefended_rank,
-			hurries,
-			epa_per_play_allowed,
-			success_rate_allowed,
-			rush_success_rate_allowed,
-			dropback_success_rate_allowed,
-			epa_per_play_allowed_rank,
-			success_rate_allowed_rank,
-			rush_success_rate_allowed_rank,
-			dropback_success_rate_allowed_rank
-		from nfl_data.nfl_team_defensive_stats_db
-		where team_name = ?
+		SELECT
+			tds.team_name,
+			sumer."sack_%",
+			sumer."sack_%_rank",
+			sumer."epa/play",
+			sumer."success_%",
+			tds.rush_success_rate_allowed,
+			tds.dropback_success_rate_allowed,
+			sumer."epa/play_rank",
+			sumer."success_%_rank",
+			tds.rush_success_rate_allowed_rank,
+			tds.dropback_success_rate_allowed_rank,
+			sds.explosive_play_rate_allowed,
+			sds.explosive_play_rate_allowed_rank,
+			sds.pressure_rate,
+			sds.pressure_rate_rank,
+			sds.blitz_rate,
+			sds.blitz_rate_rank,
+			sds.man_rate,
+			sds.man_rate_rank,
+			sds.zone_rate,
+			sds.zone_rate_rank,
+			sds.rush_stuff_rate,
+			sds.rush_stuff_rate_rank,
+			sds.yards_before_contact_per_rb_rush,
+			sds.yards_before_contact_per_rb_rush_rank,
+			sds.down_conversion_rate_allowed,
+			sds.down_conversion_rate_allowed_rank,
+			sds.yards_per_play_allowed,
+			sds.yards_per_play_allowed_rank,
+			sumer.adot,
+			sumer.adot_rank,
+			sumer."scramble_%",
+			sumer."scramble_%_rank",
+			sumer."int_%",
+			sumer."int_%_rank"
+		FROM
+			nfl_data.nfl_team_defensive_stats_db tds
+			JOIN nfl_data.nfl_sharp_defense_stats sds
+				ON tds.team_name = sds.team
+			JOIN nfl_data.nfl_sumer_defense_stats sumer
+				ON sumer.team = tds.team_name
+		WHERE
+			tds.team_name = ?
 	`
 
 	var teamDefenseStats models.NFLTeamDefenseStats
 	err := db.QueryRow(query, teamName).Scan(
 		&teamDefenseStats.TeamName,
-		&teamDefenseStats.TotalTackles,
-		&teamDefenseStats.TacklesForLoss,
-		&teamDefenseStats.TacklesForLossRank,
-		&teamDefenseStats.Stuffs,
-		&teamDefenseStats.StuffsRank,
-		&teamDefenseStats.StuffYards,
-		&teamDefenseStats.AvgStuffYards,
-		&teamDefenseStats.Sacks,
-		&teamDefenseStats.SacksRank,
-		&teamDefenseStats.SackYards,
-		&teamDefenseStats.AvgSackYards,
-		&teamDefenseStats.PassesDefended,
-		&teamDefenseStats.PassesDefendedRank,
-		&teamDefenseStats.Hurries,
+		&teamDefenseStats.SacksRate,
+		&teamDefenseStats.SacksRateRank,
 		&teamDefenseStats.EPAperPlayAllowed,
 		&teamDefenseStats.SuccessRateAllowed,
 		&teamDefenseStats.RushSuccessRateAllowed,
@@ -470,6 +476,30 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 		&teamDefenseStats.SuccessRateAllowedRank,
 		&teamDefenseStats.RushSuccessRateAllowedRank,
 		&teamDefenseStats.DropbackSuccessRateAllowedRank,
+		&teamDefenseStats.ExplosivePlayRateAllowed,
+		&teamDefenseStats.ExplosivePlayRateAllowedRank,
+		&teamDefenseStats.PressureRate,
+		&teamDefenseStats.PressureRateRank,
+		&teamDefenseStats.BlitzRate,
+		&teamDefenseStats.BlitzRateRank,
+		&teamDefenseStats.ManRate,
+		&teamDefenseStats.ManRateRank,
+		&teamDefenseStats.ZoneRate,
+		&teamDefenseStats.ZoneRateRank,
+		&teamDefenseStats.RushStuffRate,
+		&teamDefenseStats.RushStuffRateRank,
+		&teamDefenseStats.YardsBeforeContactPerRbRush,
+		&teamDefenseStats.YardsBeforeContactPerRbRushRank,
+		&teamDefenseStats.DownConversionRateAllowed,
+		&teamDefenseStats.DownConversionRateAllowedRank,
+		&teamDefenseStats.YardsPerPlayAllowed,
+		&teamDefenseStats.YardsPerPlayAllowedRank,
+		&teamDefenseStats.Adot,
+		&teamDefenseStats.AdotRank,
+		&teamDefenseStats.ScrambleRate,
+		&teamDefenseStats.ScrambleRateRank,
+		&teamDefenseStats.IntRate,
+		&teamDefenseStats.IntRateRank,
 	)
 	if err != nil {
 		return models.NFLTeamDefenseStats{}, fmt.Errorf("failed to scan team defense stats row: %w", err)
@@ -481,29 +511,37 @@ func GetNFLTeamOffenseStats(db *sql.DB, teamName string) (models.NFLTeamOffenseS
 	query := `
 		select 
 			oa.team_name,
-			epa_per_play,
-			success_rate,
+			sumer."epa/play",
+			sumer."success_%",
 			rush_success_rate,
 			dropback_success_rate,
-			epa_per_play_rank,
-			success_rate_rank,
+			sumer."epa/play_rank",
+			sumer."success_%_rank",
 			rush_success_rate_rank,
 			dropback_success_rate_rank,
 			ps.passingYardsPerGame,
 			ps.passingYardsPerGame_rank,
 			ps.yardsPerCompletion,
 			ps.yardsPerCompletion_rank,
-			ps.sacks,
-			ps.sacks_rank,
+			sumer."sack_%",
+			sumer."sack_%_rank",
 			rs.rushingAttempts,
 			rs.rushingAttempts_rank,
 			rs.yardsPerRushAttempt,
 			rs.yardsPerRushAttempt_rank,
 			ps.passingAttempts,
 			ps.passingAttempts_rank,
+			sumer.adot,
+			sumer.adot_rank,
+			sumer."scramble_%",
+			sumer."scramble_%_rank",
+			sumer."int_%",
+			sumer."int_%_rank"
 		from nfl_data.nfl_team_offense_advanced_stats oa
 		join nfl_data.nfl_team_passing_stats_db ps on oa.team_name = ps.team_name
 		join nfl_data.nfl_team_rushing_stats_db rs on oa.team_name = rs.team_name
+		JOIN nfl_data.nfl_sumer_offense_stats sumer
+				ON sumer.team = oa.team_name
 		where oa.team_name = ?
 	`
 
@@ -530,6 +568,12 @@ func GetNFLTeamOffenseStats(db *sql.DB, teamName string) (models.NFLTeamOffenseS
 		&teamOffenseStats.YardsPerRushAttemptRank,
 		&teamOffenseStats.PassingAttempts,
 		&teamOffenseStats.PassingAttemptsRank,
+		&teamOffenseStats.Adot,
+		&teamOffenseStats.AdotRank,
+		&teamOffenseStats.ScrambleRate,
+		&teamOffenseStats.ScrambleRateRank,
+		&teamOffenseStats.IntRate,
+		&teamOffenseStats.IntRateRank,
 	)
 	if err != nil {
 		return models.NFLTeamOffenseStats{}, fmt.Errorf("failed to scan team offense stats row: %w", err)
