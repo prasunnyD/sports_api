@@ -300,4 +300,87 @@ func GetTeamIDByName(db *sql.DB, teamName string) (string, error) {
 	}
 
 	return teamID, nil
-} 
+}
+
+func GetPlayerShotChartStats(db *sql.DB, playerName string, seasonID string) ([]models.NBAPlayerShotChartStats, error) {
+	query := `
+		SELECT
+          psr.LOC_X AS x,
+          psr.LOC_Y AS y,
+          psr.SHOT_MADE_FLAG::INT AS made,
+		  pb.OPPONENT as opponent
+        FROM nba_data.player_shotchart_raw psr
+		JOIN nba_data.player_boxscores pb on psr.player_id = pb.player_id and psr.game_id = pb.GAME_ID
+		JOIN nba_data.team_roster tr on psr.player_id = tr.player_id
+        WHERE tr.PLAYER = ?
+          AND psr.SEASON_ID = ?
+          AND psr.LOC_X BETWEEN -250 AND 250
+          AND psr.LOC_Y BETWEEN -50 AND 470
+	`
+
+	rows, err := db.Query(query, playerName, seasonID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query player shot chart stats: %w", err)
+	}
+	defer rows.Close()
+
+	var stats []models.NBAPlayerShotChartStats
+
+	for rows.Next() {
+		var shot models.NBAPlayerShotChartStats
+		err := rows.Scan(
+			&shot.LocX,
+			&shot.LocY,
+			&shot.ShotMadeFlag,
+			&shot.Opponent,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan shot chart row: %w", err)
+		}
+		stats = append(stats, shot)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating shot chart rows: %w", err)
+	}
+
+	return stats, nil
+}
+
+func GetPlayerAvgShotChartStats(db *sql.DB, playerName string, seasonID string) ([]models.NBAPlayerAvgShotChartStats, error) {
+	query := `
+		SELECT
+          SHOT_ZONE_BASIC,
+          SHOT_ZONE_AREA,
+          COUNT(*)::BIGINT AS attempts,
+          SUM(SHOT_MADE_FLAG)::BIGINT AS made,
+          (made/attempts) *100 ::DOUBLE AS fg_pct
+        FROM nba_data.player_shotchart_raw psr
+		JOIN nba_data.player_boxscores pb on psr.player_id = pb.player_id and psr.game_id = pb.GAME_ID
+		JOIN nba_data.team_roster tr on psr.player_id = tr.player_id
+        WHERE tr.PLAYER = ?
+          AND psr.SEASON_ID = ?
+        GROUP BY SHOT_ZONE_BASIC,SHOT_ZONE_AREA
+	`
+	rows, err := db.Query(query, playerName, seasonID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query player avg shot chart stats: %w", err)
+	}
+	defer rows.Close()
+
+	var stats []models.NBAPlayerAvgShotChartStats
+	for rows.Next() {
+		var shotZone models.NBAPlayerAvgShotChartStats
+		err := rows.Scan(&shotZone.ShotZoneBasic, &shotZone.ShotZoneArea, &shotZone.Attempts, &shotZone.Made, &shotZone.FgPct)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan player avg shot chart stats row: %w", err)
+		}
+		stats = append(stats, shotZone)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over player avg shot chart stats rows: %w", err)
+	}
+
+	return stats, nil
+}

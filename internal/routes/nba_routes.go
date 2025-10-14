@@ -15,9 +15,11 @@ func SetupNBARoutes(router *gin.RouterGroup, db *sql.DB) {
 	nba := router.Group("/nba")
 	{
 		nba.GET("/teams", nbaHandler.GetNBATeams)
-		nba.GET("/players/:city", nbaHandler.GetNBAPlayersByTeam)
+		nba.GET("/players-shotchart/:player_name/:season_id", nbaHandler.GetPlayerShotChartStats)
+		nba.GET("/players-shotchart/averages/:player_name/:season_id", nbaHandler.GetPlayerAvgShotChartStats)
 		nba.GET("/team-roster/:city", nbaHandler.GetTeamRoster)
 		nba.GET("/player/:name/last/:last_number_of_games/games", nbaHandler.GetPlayerLastXGames)
+		nba.GET("/players/:city", nbaHandler.GetNBAPlayersByTeam)
 		nba.GET("/team/:city/last/:number_of_days/games", nbaHandler.GetTeamLastXGames)
 		nba.GET("/defense-stats/:team_name", nbaHandler.GetTeamDefenseStats)
 		nba.GET("/shooting-splits/:player_name", nbaHandler.GetPlayerShootingSplits)

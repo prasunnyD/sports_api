@@ -348,3 +348,68 @@ func (h *NBAHandler) GetScoreboard(c *gin.Context) {
 
 	c.JSON(http.StatusOK, scoreboard)
 } 
+
+func (h *NBAHandler) GetPlayerShotChartStats(c *gin.Context) {
+	playerName := c.Param("player_name")
+	seasonID := c.Param("season_id")
+	
+	// Validate player name
+	if strings.TrimSpace(playerName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Player name is required",
+			})
+		return
+	}
+
+	// Validate season ID
+	if strings.TrimSpace(seasonID) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Season ID is required",
+			})
+		return
+	}
+
+	// Get player shot chart stats
+	shots, err := database.GetPlayerShotChartStats(h.db, playerName, seasonID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve player shot chart stats",
+			"details": err.Error(),
+			})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"season": seasonID,
+		"shots": shots,
+	})
+}
+
+func (h *NBAHandler) GetPlayerAvgShotChartStats(c *gin.Context) {
+	playerName := c.Param("player_name")
+	seasonID := c.Param("season_id")
+	
+	// Validate player name
+	if strings.TrimSpace(playerName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Player name is required",
+			})
+		return
+	}
+
+	// Get player avg shot chart stats
+	stats, err := database.GetPlayerAvgShotChartStats(h.db, playerName, seasonID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve player avg shot chart stats",
+			"details": err.Error(),
+			})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"season":seasonID,
+		"stats": stats,
+	})
+}

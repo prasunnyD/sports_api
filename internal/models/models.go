@@ -109,23 +109,18 @@ type NBAPlayerHeadlineStats struct {
 }
 
 type NBAPlayerShotChartStats struct {
-	PlayerName      string `json:"player_name"`
-	ShotChart       string `json:"shot_chart"`
-	PlayerID        int    `json:"player_id"`
-	SeasonID        string `json:"season_id"`
-	GameID          string `json:"game_id"`
-	GameDate        string `json:"game_date"`
 	LocX            int    `json:"loc_x"`
 	LocY            int    `json:"loc_y"`
 	ShotMadeFlag    int    `json:"shot_made_flag"`
-	ShotZoneBasic   string `json:"shot_zone_basic"`
-	ShotZoneArea    string `json:"shot_zone_area"`
-	ActionType      string `json:"action_type"`
-	ShotType        string `json:"shot_type"`
-	ShotDistance    int    `json:"shot_distance"`
-	TeamID          int64  `json:"team_id"`
 	Opponent        string `json:"opponent"`
-	GameEventID     int    `json:"game_event_id"`
+}
+
+type NBAPlayerAvgShotChartStats struct {
+	ShotZoneBasic string `json:"shot_zone_basic"`
+	ShotZoneArea string `json:"shot_zone_area"`
+	Attempts int `json:"attempts"`
+	Made int `json:"made"`
+	FgPct float64 `json:"fg_pct"`
 }
 
 // PlayerModel represents the input for points prediction
