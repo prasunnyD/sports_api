@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
+	"strconv"
 	"strings"
 	"log/slog"
 
@@ -226,3 +227,28 @@ func (h *PlayerHandler) GetTeamOffenseStats(c *gin.Context) {
 	})
 }
 
+func (h *PlayerHandler) GetNFLPassingPBPStats(c *gin.Context) {
+	playerName := c.Param("player")
+	seasonStr := c.Param("season")
+	season, err := strconv.Atoi(seasonStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid season parameter",
+			"details": err.Error(),
+		})
+		return
+	}
+	stats, err := database.GetNFLPassingPBPStats(h.db, playerName, season)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve passing PBP stats",
+			"details": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"player": playerName,
+		"season": season,
+		"stats": stats,
+	})
+}

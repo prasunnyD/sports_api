@@ -372,3 +372,13 @@ type NFLTeamOffenseStats struct {
 	IntRate string `json:"int_rate"`
 	IntRateRank int `json:"int_rate_rank"`
 }
+
+type NFLPassingPBPStats struct {
+	Week int `json:"week"`
+	Opponent string `json:"opponent"`
+	CompletePass int `json:"complete_pass"`
+	Interception int `json:"interception"`
+	AirYards int `json:"air_yards"`
+	PassLocation string `json:"pass_location"`
+	PassLength string `json:"pass_length"`
+}

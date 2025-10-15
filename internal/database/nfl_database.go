@@ -580,3 +580,46 @@ func GetNFLTeamOffenseStats(db *sql.DB, teamName string) (models.NFLTeamOffenseS
 	}
 	return teamOffenseStats, nil
 }
+
+func GetNFLPassingPBPStats(db *sql.DB, playerName string, season int) ([]models.NFLPassingPBPStats, error) {
+	query := `
+		SELECT 
+			week,
+			opponent,
+			complete_pass, 
+			interception, 
+			air_yards, 
+			pass_location, 
+			pass_length 
+		FROM nfl_data.nfl_pbp_qb_data 
+		WHERE passer = ?
+		AND season = ?
+	`
+
+	var passingPBPStats []models.NFLPassingPBPStats
+	rows, err := db.Query(query, playerName, season)
+	if err != nil {
+		return []models.NFLPassingPBPStats{}, fmt.Errorf("failed to query passing PBP stats: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var passingPBPStat models.NFLPassingPBPStats
+		err := rows.Scan(
+			&passingPBPStat.Week,
+			&passingPBPStat.Opponent,
+			&passingPBPStat.CompletePass,
+			&passingPBPStat.Interception,
+			&passingPBPStat.AirYards,
+			&passingPBPStat.PassLocation,
+			&passingPBPStat.PassLength,
+		)
+		if err != nil {
+			return []models.NFLPassingPBPStats{}, fmt.Errorf("failed to scan passing PBP stats row: %w", err)
+		}
+		passingPBPStats = append(passingPBPStats, passingPBPStat)
+	}
+	if err = rows.Err(); err != nil {
+		return []models.NFLPassingPBPStats{}, fmt.Errorf("error iterating over passing PBP stats rows: %w", err)
+	}
+	return passingPBPStats, nil
+}
