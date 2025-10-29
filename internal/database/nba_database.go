@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sports_api/internal/models"
+	"os"
 )
 
 // NBA Database operations
@@ -383,4 +384,64 @@ func GetPlayerAvgShotChartStats(db *sql.DB, playerName string, seasonID string) 
 	}
 
 	return stats, nil
+}
+
+
+func opponentZonesTable() string {
+	if t := os.Getenv("OPP_ZONES_TABLE"); t != "" {
+		return t
+	}
+	// Keep this consistent with your other queries (schema prefix: nba_data.*).
+	// If your table lives under nba_data.main.team_opponent_zones in MotherDuck,
+	// you can set OPP_ZONES_TABLE to "nba_data.main.team_opponent_zones" at runtime.
+	return "nba_data.team_opponent_zones"
+}
+
+// GetOpponentZonesByTeamSeason fetches opponent overall shooting by zone
+// for a given team abbreviation and season.
+// Returns a map keyed by region name with FGM/FGA/FG_PCT (FG_PCT is 0..1).
+func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.OpponentZonesResponse, error) {
+	query := fmt.Sprintf(`
+		SELECT REGION, FGM, FGA, FG_PCT
+		FROM %s
+		WHERE UPPER(TEAM_ABBR) = UPPER(?)
+		  AND SEASON = ?
+	`, opponentZonesTable())
+
+	rows, err := db.Query(query, teamAbbr, season)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query opponent zones: %w", err)
+	}
+	defer rows.Close()
+
+	zones := make(map[string]models.ZoneValue)
+
+	for rows.Next() {
+		var (
+			region string
+			fgmPtr *float64
+			fgaPtr *float64
+			fgpPtr *float64
+		)
+		if err := rows.Scan(&region, &fgmPtr, &fgaPtr, &fgpPtr); err != nil {
+			return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
+		}
+
+		zones[region] = models.ZoneValue{
+			FgPct: fgpPtr,
+			Fgm:   fgmPtr,
+			Fga:   fgaPtr,
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
+	}
+
+	resp := &models.OpponentZonesResponse{
+		Team:   teamAbbr,
+		Season: season,
+		Zones:  zones,
+	}
+	return resp, nil
 }

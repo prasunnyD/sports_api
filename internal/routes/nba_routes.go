@@ -7,11 +7,10 @@ import (
 	"sports_api/internal/handlers"
 )
 
-// SetupNBARoutes configures all NBA-related routes
+// SetupNBARoutes configures all NBA-related routes under the given group.
 func SetupNBARoutes(router *gin.RouterGroup, db *sql.DB) {
 	nbaHandler := handlers.NewNBAHandler(db)
 
-	// NBA routes
 	nba := router.Group("/nba")
 	{
 		nba.GET("/teams", nbaHandler.GetNBATeams)
@@ -27,5 +26,12 @@ func SetupNBARoutes(router *gin.RouterGroup, db *sql.DB) {
 		nba.POST("/points-prediction/:player_name", nbaHandler.PointsPrediction)
 		nba.POST("/poisson-dist", nbaHandler.GetPoissonDistribution)
 		nba.GET("/scoreboard", nbaHandler.GetScoreboard)
+
+		// Opponent allowed FG% by zone
+	// 	nba.GET("/opponent-shooting/by-zone", nbaHandler.GetOpponentShootingByZone)
+	// // Path param forms (your logs show :opponent)
+	// 	nba.GET("/opponent-shooting/by-zone/:opponent", nbaHandler.GetOpponentShootingByZone)
+		nba.GET("/opponent-shooting/by-zone/:opponent/:season", nbaHandler.GetOpponentShootingByZone)
+
 	}
-} 
+}

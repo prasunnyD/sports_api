@@ -123,6 +123,18 @@ type NBAPlayerAvgShotChartStats struct {
 	FgPct float64 `json:"fg_pct"`
 }
 
+type ZoneValue struct {
+	FgPct *float64 `json:"fg_pct,omitempty"`
+	Fgm   *float64 `json:"fgm,omitempty"`
+	Fga   *float64 `json:"fga,omitempty"`
+}
+
+type OpponentZonesResponse struct {
+	Team   string               `json:"team"`
+	Season string               `json:"season"`
+	Zones  map[string]ZoneValue `json:"zones"`
+}
+
 // PlayerModel represents the input for points prediction
 type PlayerModel struct {
 	OppCity string  `json:"opp_city"`
