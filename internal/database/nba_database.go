@@ -420,7 +420,6 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
 		SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
 		FROM ranked
 		WHERE UPPER(TEAM_ABBR) = UPPER(?)
-		   OR UPPER(TEAM_NAME) = UPPER(?)
 	`, opponentZonesTable())
 
 	rows, err := db.Query(query, season, teamAbbr, teamAbbr)
