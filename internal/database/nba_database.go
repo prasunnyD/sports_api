@@ -12,9 +12,9 @@ import (
 // GetNBAPlayersByTeam retrieves all players for a given NBA team
 func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	query := `
-		SELECT PLAYER_ID, PLAYER, "POSITION", TeamID, NUM 
+		SELECT PLAYER_ID, PLAYER, "POSITION", Team, NUM 
 		FROM nba_data.team_roster 
-		WHERE TeamID = ? 
+		WHERE Team = ? 
 		ORDER BY PLAYER
 	`
 
