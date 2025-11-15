@@ -12,9 +12,9 @@ import (
 // GetNBAPlayersByTeam retrieves all players for a given NBA team
 func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	query := `
-		SELECT PLAYER_ID, PLAYER, "POSITION", Team, NUM 
+		SELECT PLAYER_ID, PLAYER, "POSITION", TEAM, NUM 
 		FROM nba_data.team_roster 
-		WHERE Team = ? 
+		WHERE TEAM = ? 
 		ORDER BY PLAYER
 	`
 
@@ -46,7 +46,7 @@ func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 // GetNBATeams retrieves all NBA teams
 func GetNBATeams(db *sql.DB) ([]models.Team, error) {
 	query := `
-		SELECT DISTINCT TeamID, NICKNAME, NICKNAME, TeamID 
+		SELECT DISTINCT TeamID, TEAM
 		FROM nba_data.team_roster 
 	`
 
@@ -59,7 +59,7 @@ func GetNBATeams(db *sql.DB) ([]models.Team, error) {
 	var teams []models.Team
 	for rows.Next() {
 		var team models.Team
-		err := rows.Scan(&team.TeamID, &team.TeamName, &team.City, &team.Abbr)
+		err := rows.Scan(&team.TeamID, &team.City)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan NBA team row: %w", err)
 		}
