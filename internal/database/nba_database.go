@@ -402,46 +402,57 @@ func opponentZonesTable() string {
 // Returns a map keyed by region name with FGM/FGA/FG_PCT (FG_PCT is 0..1).
 func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.OpponentZonesResponse, error) {
 	query := fmt.Sprintf(`
-		SELECT REGION, FGM, FGA, FG_PCT
-		FROM %s
+		WITH ranked AS (
+			SELECT
+				TEAM_ID,
+				TEAM_ABBR,
+				TEAM_NAME,
+				SEASON,
+				REGION,
+				FGM,
+				FGA,
+				FG_PCT,
+				RANK()  OVER (PARTITION BY SEASON, REGION ORDER BY FG_PCT DESC) AS FG_RANK,
+				COUNT(*) OVER (PARTITION BY SEASON, REGION)                       AS OUT_OF
+			FROM %s
+			WHERE SEASON = ?
+		)
+		SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
+		FROM ranked
 		WHERE UPPER(TEAM_ABBR) = UPPER(?)
-		  AND SEASON = ?
 	`, opponentZonesTable())
 
-	rows, err := db.Query(query, teamAbbr, season)
+	rows, err := db.Query(query, season, teamAbbr, teamAbbr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query opponent zones: %w", err)
 	}
 	defer rows.Close()
 
-	zones := make(map[string]models.ZoneValue)
-
+	zones := make(map[string]models.ZoneValue, 8)
 	for rows.Next() {
 		var (
-			region string
-			fgmPtr *float64
-			fgaPtr *float64
-			fgpPtr *float64
+			region        string
+			fgmPtr, fgaPtr, fgpPtr *float64
+			rankPtr, outOfPtr      *int
 		)
-		if err := rows.Scan(&region, &fgmPtr, &fgaPtr, &fgpPtr); err != nil {
+		if err := rows.Scan(&region, &fgmPtr, &fgaPtr, &fgpPtr, &rankPtr, &outOfPtr); err != nil {
 			return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
 		}
-
 		zones[region] = models.ZoneValue{
-			FgPct: fgpPtr,
-			Fgm:   fgmPtr,
-			Fga:   fgaPtr,
+			FgPct:  fgpPtr,
+			Fgm:    fgmPtr,
+			Fga:    fgaPtr,
+			FgRank: rankPtr,
+			OutOf:  outOfPtr,
 		}
 	}
-
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
 	}
 
-	resp := &models.OpponentZonesResponse{
+	return &models.OpponentZonesResponse{
 		Team:   teamAbbr,
 		Season: season,
 		Zones:  zones,
-	}
-	return resp, nil
+	}, nil
 }
