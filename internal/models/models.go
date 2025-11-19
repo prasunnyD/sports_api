@@ -127,8 +127,8 @@ type ZoneValue struct {
 	FgPct  *float64 `json:"fg_pct,omitempty"`
 	Fgm    *float64 `json:"fgm,omitempty"`
 	Fga    *float64 `json:"fga,omitempty"`
-	FgRank *int     `json:"fg_rank,omitempty"` // <-- NEW: league rank within (season, zone)
-	OutOf  *int     `json:"out_of,omitempty"`  // <-- NEW: number of teams ranked
+	FgRank *int     `json:"fg_rank"`  // <- no omitempty
+    OutOf  *int     `json:"out_of"`   // <- no omitempty
 }
 
 type OpponentZonesResponse struct {
