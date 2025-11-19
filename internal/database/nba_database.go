@@ -401,58 +401,68 @@ func opponentZonesTable() string {
 // for a given team abbreviation and season.
 // Returns a map keyed by region name with FGM/FGA/FG_PCT (FG_PCT is 0..1).
 func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.OpponentZonesResponse, error) {
-	query := fmt.Sprintf(`
-		WITH ranked AS (
-			SELECT
-				TEAM_ID,
-				TEAM_ABBR,
-				TEAM_NAME,
-				SEASON,
-				REGION,
-				FGM,
-				FGA,
-				FG_PCT,
-				RANK()  OVER (PARTITION BY SEASON, REGION ORDER BY FG_PCT DESC) AS FG_RANK,
-				COUNT(*) OVER (PARTITION BY SEASON, REGION)                       AS OUT_OF
-			FROM %s
-			WHERE SEASON = ?
-		)
-		SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
-		FROM ranked
-		WHERE UPPER(TEAM_ABBR) = UPPER(?)
-	`, opponentZonesTable())
+    query := fmt.Sprintf(`
+        WITH ranked AS (
+            SELECT
+                TEAM_ID,
+                TEAM_ABBR,
+                TEAM_NAME,
+                SEASON,
+                REGION,
+                FGM,
+                FGA,
+                FG_PCT,
+                RANK()  OVER (PARTITION BY SEASON, REGION ORDER BY FG_PCT DESC) AS FG_RANK,
+                COUNT(*) OVER (PARTITION BY SEASON, REGION)                       AS OUT_OF
+            FROM %s
+            WHERE SEASON = ?
+        )
+        SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
+        FROM ranked
+        WHERE UPPER(TEAM_ABBR) = UPPER(?)
+    `, opponentZonesTable())
 
-	rows, err := db.Query(query, season, teamAbbr, teamAbbr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query opponent zones: %w", err)
-	}
-	defer rows.Close()
+    // NOTE: only two args – season, teamAbbr
+    rows, err := db.Query(query, season, teamAbbr)
+    if err != nil {
+        return nil, fmt.Errorf("failed to query opponent zones: %w", err)
+    }
+    defer rows.Close()
 
-	zones := make(map[string]models.ZoneValue, 8)
-	for rows.Next() {
-		var (
-			region        string
-			fgmPtr, fgaPtr, fgpPtr *float64
-			rankPtr, outOfPtr      *int
-		)
-		if err := rows.Scan(&region, &fgmPtr, &fgaPtr, &fgpPtr, &rankPtr, &outOfPtr); err != nil {
-			return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
-		}
-		zones[region] = models.ZoneValue{
-			FgPct:  fgpPtr,
-			Fgm:    fgmPtr,
-			Fga:    fgaPtr,
-			FgRank: rankPtr,
-			OutOf:  outOfPtr,
-		}
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
-	}
+    zones := make(map[string]models.ZoneValue, 8)
+    for rows.Next() {
+        var (
+            region       string
+            fgm, fga     float64
+            fgp          float64
+            rank, outOf  int
+        )
+        if err := rows.Scan(&region, &fgm, &fga, &fgp, &rank, &outOf); err != nil {
+            return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
+        }
 
-	return &models.OpponentZonesResponse{
-		Team:   teamAbbr,
-		Season: season,
-		Zones:  zones,
-	}, nil
+        // take addresses of local vars so struct gets *float64 / *int
+        fgmCopy := fgm
+        fgaCopy := fga
+        fgpCopy := fgp
+        rankCopy := rank
+        outOfCopy := outOf
+
+        zones[region] = models.ZoneValue{
+            FgPct:  &fgpCopy,
+            Fgm:    &fgmCopy,
+            Fga:    &fgaCopy,
+            FgRank: &rankCopy,
+            OutOf:  &outOfCopy,
+        }
+    }
+    if err := rows.Err(); err != nil {
+        return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
+    }
+
+    return &models.OpponentZonesResponse{
+        Team:   teamAbbr,
+        Season: season,
+        Zones:  zones,
+    }, nil
 }
