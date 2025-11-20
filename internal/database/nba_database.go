@@ -401,28 +401,15 @@ func opponentZonesTable() string {
 // for a given team abbreviation and season.
 // Returns a map keyed by region name with FGM/FGA/FG_PCT (FG_PCT is 0..1).
 func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.OpponentZonesResponse, error) {
+    // FG_RANK and OUT_OF are now persisted in the table by the Python pipeline.
     query := fmt.Sprintf(`
-        WITH ranked AS (
-            SELECT
-                TEAM_ID,
-                TEAM_ABBR,
-                TEAM_NAME,
-                SEASON,
-                REGION,
-                FGM,
-                FGA,
-                FG_PCT,
-                RANK()  OVER (PARTITION BY SEASON, REGION ORDER BY FG_PCT DESC) AS FG_RANK,
-                COUNT(*) OVER (PARTITION BY SEASON, REGION)                       AS OUT_OF
-            FROM %s
-            WHERE SEASON = ?
-        )
         SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
-        FROM ranked
-        WHERE UPPER(TEAM_ABBR) = UPPER(?)
+        FROM %s
+        WHERE SEASON = ?
+          AND UPPER(TEAM_ABBR) = UPPER(?)
     `, opponentZonesTable())
 
-    // NOTE: only two args – season, teamAbbr
+    // only two args – season, teamAbbr
     rows, err := db.Query(query, season, teamAbbr)
     if err != nil {
         return nil, fmt.Errorf("failed to query opponent zones: %w", err)
@@ -430,13 +417,15 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
     defer rows.Close()
 
     zones := make(map[string]models.ZoneValue, 8)
+
     for rows.Next() {
         var (
-            region       string
-            fgm, fga     float64
-            fgp          float64
-            rank, outOf  int
+            region      string
+            fgm, fga    float64
+            fgp         float64
+            rank, outOf int
         )
+
         if err := rows.Scan(&region, &fgm, &fga, &fgp, &rank, &outOf); err != nil {
             return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
         }
@@ -456,6 +445,7 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
             OutOf:  &outOfCopy,
         }
     }
+
     if err := rows.Err(); err != nil {
         return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
     }
