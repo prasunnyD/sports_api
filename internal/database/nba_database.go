@@ -400,59 +400,57 @@ func opponentZonesTable() string {
 // for a given team abbreviation and season.
 // Returns a map keyed by region name with FGM/FGA/FG_PCT (FG_PCT is 0..1).
 func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.OpponentZonesResponse, error) {
-    // FG_RANK and OUT_OF are now persisted in the table by the Python pipeline.
-    query := fmt.Sprintf(`
+	// FG_RANK and OUT_OF are now persisted in the table by the Python pipeline.
+	query := fmt.Sprintf(`
         SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
         FROM %s
         WHERE SEASON = ?
           AND UPPER(TEAM_ABBR) = UPPER(?)
     `, opponentZonesTable())
 
-    // only two args – season, teamAbbr
-    rows, err := db.Query(query, season, teamAbbr)
-    if err != nil {
-        return nil, fmt.Errorf("failed to query opponent zones: %w", err)
-    }
-    defer rows.Close()
+	// only two args – season, teamAbbr
+	rows, err := db.Query(query, season, teamAbbr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query opponent zones: %w", err)
+	}
+	defer rows.Close()
 
-    zones := make(map[string]models.ZoneValue, 8)
+	zones := make(map[string]models.ZoneValue, 8)
 
-    for rows.Next() {
-        var (
-            region      string
-            fgm, fga    float64
-            fgp         float64
-            rank, outOf int
-        )
+	for rows.Next() {
+		var (
+			region      string
+			fgm, fga    float64
+			fgp         float64
+			rank, outOf int
+		)
 
-        if err := rows.Scan(&region, &fgm, &fga, &fgp, &rank, &outOf); err != nil {
-            return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
-        }
+		if err := rows.Scan(&region, &fgm, &fga, &fgp, &rank, &outOf); err != nil {
+			return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
+		}
 
-        // take addresses of local vars so struct gets *float64 / *int
-        fgmCopy := fgm
-        fgaCopy := fga
-        fgpCopy := fgp
-        rankCopy := rank
-        outOfCopy := outOf
+		// take addresses of local vars so struct gets *float64 / *int
+		fgmCopy := fgm
+		fgaCopy := fga
+		fgpCopy := fgp
+		rankCopy := rank
+		outOfCopy := outOf
+		zones[region] = models.ZoneValue{
+			FgPct:  &fgpCopy,
+			Fgm:    &fgmCopy,
+			Fga:    &fgaCopy,
+			FgRank: &rankCopy,
+			OutOf:  &outOfCopy,
+		}
+	}
 
-<<<<<<< HEAD
-        zones[region] = models.ZoneValue{
-            FgPct:  &fgpCopy,
-            Fgm:    &fgmCopy,
-            Fga:    &fgaCopy,
-            FgRank: &rankCopy,
-            OutOf:  &outOfCopy,
-        }
-    }
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
+	}
 
-    if err := rows.Err(); err != nil {
-        return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
-    }
-
-    return &models.OpponentZonesResponse{
-        Team:   teamAbbr,
-        Season: season,
-        Zones:  zones,
-    }, nil
+	return &models.OpponentZonesResponse{
+		Team:   teamAbbr,
+		Season: season,
+		Zones:  zones,
+	}, nil
 }
