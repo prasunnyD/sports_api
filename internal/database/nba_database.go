@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"sports_api/internal/models"
 	"os"
+	"sports_api/internal/models"
 )
 
 // NBA Database operations
@@ -77,12 +77,12 @@ func GetNBATeams(db *sql.DB) ([]models.Team, error) {
 func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[string]models.NBAGameStats, error) {
 	query := `
 		SELECT 
-			GAME_DATE, 
-			PTS, 
-			AST, 
-			REB, 
-			FG3M, 
-			MIN
+			game_date, 
+			points, 
+			assists, 
+			reboundsTotal, 
+			threePointersMade, 
+			minutes_per_game
 		FROM 
 			nba_data.player_boxscores bx
 			JOIN nba_data.team_roster tr ON bx.player_id = tr.player_id
@@ -280,7 +280,7 @@ func GetPlayerHeadlineStats(db *sql.DB, playerName string) (*models.NBAPlayerHea
 // GetPlayerIDByName retrieves player ID by name
 func GetPlayerIDByName(db *sql.DB, playerName string) (string, error) {
 	query := `SELECT PLAYER_ID FROM nba_data.nba_roster_db WHERE PLAYER_NAME = ? LIMIT 1`
-	
+
 	var playerID string
 	err := db.QueryRow(query, playerName).Scan(&playerID)
 	if err != nil {
@@ -293,7 +293,7 @@ func GetPlayerIDByName(db *sql.DB, playerName string) (string, error) {
 // GetTeamIDByName retrieves team ID by name
 func GetTeamIDByName(db *sql.DB, teamName string) (string, error) {
 	query := `SELECT TEAM_ID FROM nba_data.nba_roster_db WHERE TEAM_NAME = ? LIMIT 1`
-	
+
 	var teamID string
 	err := db.QueryRow(query, teamName).Scan(&teamID)
 	if err != nil {
@@ -386,7 +386,6 @@ func GetPlayerAvgShotChartStats(db *sql.DB, playerName string, seasonID string) 
 	return stats, nil
 }
 
-
 func opponentZonesTable() string {
 	if t := os.Getenv("OPP_ZONES_TABLE"); t != "" {
 		return t
@@ -437,6 +436,7 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
         rankCopy := rank
         outOfCopy := outOf
 
+<<<<<<< HEAD
         zones[region] = models.ZoneValue{
             FgPct:  &fgpCopy,
             Fgm:    &fgmCopy,
