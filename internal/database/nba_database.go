@@ -235,6 +235,50 @@ func GetTeamDefenseStats(db *sql.DB, teamName string) (*models.NBATeamDefenseSta
 	return &stats, nil
 }
 
+func GetTeamOffenseStats(db *sql.DB, teamName string) (*models.NBATeamOffenseStats, error) {
+	query := `
+	SELECT 
+			adv.OFF_RATING_RANK, 
+			adv.OFF_RATING, 
+			adv.REB_PCT_RANK, 
+			adv.REB_PCT,
+      		adv.AST_PCT_RANK, 
+			adv.AST_PCT,
+			adv.PACE_RANK, 
+			adv.PACE,
+			ff.EFG_PCT_RANK, 
+			ff.EFG_PCT, 
+			ff.FTA_RATE_RANK, 
+			ff.FTA_RATE,
+      		ff.TM_TOV_PCT_RANK, 
+			ff.TM_TOV_PCT,
+			adv.OREB_PCT_RANK, 
+			adv.OREB_PCT, 
+			adv.TEAM_NAME
+		FROM 
+			nba_data.teams_advanced_stats adv
+			JOIN nba_data.teams_four_factors_stats ff ON adv.TEAM_ID = ff.TEAM_ID
+		WHERE 
+			adv.TEAM_NAME = ?
+		LIMIT 1
+	`
+
+	var stats models.NBATeamOffenseStats
+
+	err := db.QueryRow(query, teamName).Scan(
+		&stats.OffRatingRank, &stats.OffRating, &stats.RebPctRank, &stats.RebPct,
+		&stats.AstPctRank, &stats.AstPct, &stats.PaceRank, &stats.Pace,
+		&stats.EfgPctRank, &stats.EfgPct, &stats.FtaRateRank, &stats.FtaRate,
+		&stats.TmTovPctRank, &stats.TmTovPct, &stats.OrebPctRank, &stats.OrebPct, &stats.TeamName,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to query team defense stats: %w", err)
+	}
+
+	return &stats, nil
+}
+
 // GetPlayerShootingSplits retrieves player shooting splits
 func GetPlayerShootingSplits(db *sql.DB, playerName string) (*models.NBAPlayerShootingSplits, error) {
 	query := `

@@ -82,6 +82,26 @@ type NBATeamDefenseStats struct {
 	OppOrebPct      float64 `json:"opp_oreb_pct"`
 }
 
+type NBATeamOffenseStats struct {
+	TeamName      string  `json:"team_name"`
+	OffRatingRank int     `json:"off_rating_rank"`
+	OffRating     float64 `json:"off_rating"`
+	RebPctRank    int     `json:"reb_pct_rank"`
+	RebPct        float64 `json:"reb_pct"`
+	AstPctRank    int     `json:"ast_pct_rank"`
+	AstPct        float64 `json:"ast_pct"`
+	PaceRank      int     `json:"pace_rank"`
+	Pace          float64 `json:"pace"`
+	EfgPctRank    int     `json:"efg_pct_rank"`
+	EfgPct        float64 `json:"efg_pct"`
+	FtaRateRank   int     `json:"fta_rate_rank"`
+	FtaRate       float64 `json:"fta_rate"`
+	TmTovPctRank  int     `json:"tm_tov_pct_rank"`
+	TmTovPct      float64 `json:"tm_tov_pct"`
+	OrebPctRank   int     `json:"oreb_pct_rank"`
+	OrebPct       float64 `json:"oreb_pct"`
+}
+
 // PlayerShootingSplits represents player shooting statistics
 type NBAPlayerShootingSplits struct {
 	PlayerName    string  `json:"player_name"`

@@ -222,6 +222,32 @@ func (h *NBAHandler) GetTeamDefenseStats(c *gin.Context) {
 	})
 }
 
+func (h *NBAHandler) GetTeamOffenseStats(c *gin.Context) {
+	teamName := c.Param("team_name")
+
+	// Validate team name
+	if strings.TrimSpace(teamName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Team name is required",
+		})
+		return
+	}
+
+	// Get team defense stats
+	stats, err := database.GetTeamOffenseStats(h.db, teamName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve team defense stats",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		teamName: stats,
+	})
+}
+
 // GetPlayerShootingSplits retrieves player shooting splits
 func (h *NBAHandler) GetPlayerShootingSplits(c *gin.Context) {
 	playerName := c.Param("player_name")
