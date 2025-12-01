@@ -67,6 +67,7 @@ type NBATeamDefenseStats struct {
 	OppAst          float64 `json:"opp_ast"`
 	OppFg3aRank     int     `json:"opp_fg3a_rank"`
 	OppFg3a         float64 `json:"opp_fg3a"`
+	OppFg3PctRank   int     `json:"opp_fg3_pct_rank"`
 	OppFg3Pct       float64 `json:"opp_fg3_pct"`
 	DefRatingRank   int     `json:"def_rating_rank"`
 	DefRating       float64 `json:"def_rating"`
