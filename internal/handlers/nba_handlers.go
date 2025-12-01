@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"math"
 	"net/http"
-	"strconv"
-	"strings"	
-	"github.com/gin-gonic/gin"
 	"sports_api/internal/database"
 	"sports_api/internal/models"
+	"strconv"
+	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // NBAHandler handles NBA-related HTTP requests
@@ -24,7 +25,7 @@ func NewNBAHandler(db *sql.DB) *NBAHandler {
 // GetNBAPlayersByTeam retrieves all players for a given NBA team
 func (h *NBAHandler) GetNBAPlayersByTeam(c *gin.Context) {
 	teamCity := c.Param("city")
-	
+
 	// Validate team city
 	if strings.TrimSpace(teamCity) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -37,7 +38,7 @@ func (h *NBAHandler) GetNBAPlayersByTeam(c *gin.Context) {
 	players, err := database.GetNBAPlayersByTeam(h.db, teamCity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve NBA players",
+			"error":   "Failed to retrieve NBA players",
 			"details": err.Error(),
 		})
 		return
@@ -56,7 +57,7 @@ func (h *NBAHandler) GetNBATeams(c *gin.Context) {
 	teams, err := database.GetNBATeams(h.db)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve NBA teams",
+			"error":   "Failed to retrieve NBA teams",
 			"details": err.Error(),
 		})
 		return
@@ -72,7 +73,7 @@ func (h *NBAHandler) GetNBATeams(c *gin.Context) {
 func (h *NBAHandler) GetPlayerLastXGames(c *gin.Context) {
 	playerName := c.Param("name")
 	lastXGamesStr := c.Param("last_number_of_games")
-	
+
 	// Validate parameters
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -93,7 +94,7 @@ func (h *NBAHandler) GetPlayerLastXGames(c *gin.Context) {
 	gameLogs, err := database.GetPlayerLastXGames(h.db, playerName, lastXGames)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player game logs",
+			"error":   "Failed to retrieve player game logs",
 			"details": err.Error(),
 		})
 		return
@@ -113,7 +114,7 @@ func (h *NBAHandler) GetPlayerLastXGames(c *gin.Context) {
 func (h *NBAHandler) GetTeamLastXGames(c *gin.Context) {
 	teamCity := c.Param("city")
 	lastXGamesStr := c.Param("number_of_days")
-	
+
 	// Validate parameters
 	if strings.TrimSpace(teamCity) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -134,7 +135,7 @@ func (h *NBAHandler) GetTeamLastXGames(c *gin.Context) {
 	gameLogs, err := database.GetTeamLastXGames(h.db, teamCity, lastXGames)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve team game logs",
+			"error":   "Failed to retrieve team game logs",
 			"details": err.Error(),
 		})
 		return
@@ -153,7 +154,7 @@ func (h *NBAHandler) GetTeamLastXGames(c *gin.Context) {
 // GetTeamRoster retrieves a team's roster
 func (h *NBAHandler) GetTeamRoster(c *gin.Context) {
 	teamCity := c.Param("city")
-	
+
 	// Validate team city
 	if strings.TrimSpace(teamCity) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -166,7 +167,7 @@ func (h *NBAHandler) GetTeamRoster(c *gin.Context) {
 	players, err := database.GetNBAPlayersByTeam(h.db, teamCity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve team roster",
+			"error":   "Failed to retrieve team roster",
 			"details": err.Error(),
 		})
 		return
@@ -197,7 +198,7 @@ func (h *NBAHandler) GetTeamRoster(c *gin.Context) {
 // GetTeamDefenseStats retrieves team defensive statistics
 func (h *NBAHandler) GetTeamDefenseStats(c *gin.Context) {
 	teamName := c.Param("team_name")
-	
+
 	// Validate team name
 	if strings.TrimSpace(teamName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -210,7 +211,7 @@ func (h *NBAHandler) GetTeamDefenseStats(c *gin.Context) {
 	stats, err := database.GetTeamDefenseStats(h.db, teamName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve team defense stats",
+			"error":   "Failed to retrieve team defense stats",
 			"details": err.Error(),
 		})
 		return
@@ -224,7 +225,7 @@ func (h *NBAHandler) GetTeamDefenseStats(c *gin.Context) {
 // GetPlayerShootingSplits retrieves player shooting splits
 func (h *NBAHandler) GetPlayerShootingSplits(c *gin.Context) {
 	playerName := c.Param("player_name")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -237,7 +238,7 @@ func (h *NBAHandler) GetPlayerShootingSplits(c *gin.Context) {
 	splits, err := database.GetPlayerShootingSplits(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player shooting splits",
+			"error":   "Failed to retrieve player shooting splits",
 			"details": err.Error(),
 		})
 		return
@@ -251,7 +252,7 @@ func (h *NBAHandler) GetPlayerShootingSplits(c *gin.Context) {
 // GetPlayerHeadlineStats retrieves player headline statistics
 func (h *NBAHandler) GetPlayerHeadlineStats(c *gin.Context) {
 	playerName := c.Param("player_name")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -264,7 +265,7 @@ func (h *NBAHandler) GetPlayerHeadlineStats(c *gin.Context) {
 	stats, err := database.GetPlayerHeadlineStats(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player headline stats",
+			"error":   "Failed to retrieve player headline stats",
 			"details": err.Error(),
 		})
 		return
@@ -278,7 +279,7 @@ func (h *NBAHandler) GetPlayerHeadlineStats(c *gin.Context) {
 // PointsPrediction predicts player points (placeholder implementation)
 func (h *NBAHandler) PointsPrediction(c *gin.Context) {
 	_ = c.Param("player_name") // Using player name parameter but not implementing prediction logic yet
-	
+
 	var playerModel models.PlayerModel
 	if err := c.ShouldBindJSON(&playerModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -309,11 +310,11 @@ func (h *NBAHandler) GetPoissonDistribution(c *gin.Context) {
 
 	// Calculate Poisson distribution
 	_ = math.Round(poissonDist.PredictedPoints) // Using projected points but not implementing full calculation yet
-	_ = poissonDist.BookLine // Using book line but not implementing full calculation yet
+	_ = poissonDist.BookLine                    // Using book line but not implementing full calculation yet
 
 	// Simple Poisson calculation (placeholder)
 	// In a real implementation, you would use proper Poisson distribution
-	lessThan := 0.4  // Placeholder
+	lessThan := 0.4    // Placeholder
 	greaterThan := 0.6 // Placeholder
 
 	c.JSON(http.StatusOK, gin.H{
@@ -324,39 +325,27 @@ func (h *NBAHandler) GetPoissonDistribution(c *gin.Context) {
 
 // GetScoreboard retrieves live scoreboard (placeholder implementation)
 func (h *NBAHandler) GetScoreboard(c *gin.Context) {
-	// This is a placeholder implementation
-	// In a real scenario, you would fetch live data from NBA API
-	scoreboard := map[string]models.Game{
-		"game1": {
-			GameID:    "game1",
-			HomeTeam:  "Los Angeles Lakers",
-			AwayTeam:  "Golden State Warriors",
-			HomeScore: 105,
-			AwayScore: 98,
-			Status:    "Final",
-		},
-		"game2": {
-			GameID:    "game2",
-			HomeTeam:  "Boston Celtics",
-			AwayTeam:  "Miami Heat",
-			HomeScore: 112,
-			AwayScore: 108,
-			Status:    "Q4",
-		},
+	scoreboard, err := database.GetScoreboard(h.db)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve player shot chart stats",
+			"details": err.Error(),
+		})
+		return
 	}
 
 	c.JSON(http.StatusOK, scoreboard)
-} 
+}
 
 func (h *NBAHandler) GetPlayerShotChartStats(c *gin.Context) {
 	playerName := c.Param("player_name")
 	seasonID := c.Param("season_id")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Player name is required",
-			})
+		})
 		return
 	}
 
@@ -364,7 +353,7 @@ func (h *NBAHandler) GetPlayerShotChartStats(c *gin.Context) {
 	if strings.TrimSpace(seasonID) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Season ID is required",
-			})
+		})
 		return
 	}
 
@@ -372,28 +361,28 @@ func (h *NBAHandler) GetPlayerShotChartStats(c *gin.Context) {
 	shots, err := database.GetPlayerShotChartStats(h.db, playerName, seasonID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player shot chart stats",
+			"error":   "Failed to retrieve player shot chart stats",
 			"details": err.Error(),
-			})
+		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
 		"season": seasonID,
-		"shots": shots,
+		"shots":  shots,
 	})
 }
 
 func (h *NBAHandler) GetPlayerAvgShotChartStats(c *gin.Context) {
 	playerName := c.Param("player_name")
 	seasonID := c.Param("season_id")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Player name is required",
-			})
+		})
 		return
 	}
 
@@ -401,18 +390,17 @@ func (h *NBAHandler) GetPlayerAvgShotChartStats(c *gin.Context) {
 	stats, err := database.GetPlayerAvgShotChartStats(h.db, playerName, seasonID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player avg shot chart stats",
+			"error":   "Failed to retrieve player avg shot chart stats",
 			"details": err.Error(),
-			})
+		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
-		"season":seasonID,
-		"stats": stats,
+		"season": seasonID,
+		"stats":  stats,
 	})
 }
-
 
 // GetOpponentShootingByZone
 

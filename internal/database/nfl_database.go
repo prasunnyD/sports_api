@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"sports_api/internal/models"
 	"log/slog"
+	"sports_api/internal/models"
 )
 
 // NFL Database operations
@@ -70,7 +70,7 @@ func GetAllTeams(db *sql.DB) ([]string, error) {
 	}
 
 	return teams, nil
-} 
+}
 
 func GetPlayerRushingStats(db *sql.DB, playerName string) (models.NFLPlayerRushingStats, error) {
 	query := `
@@ -127,7 +127,6 @@ func GetPlayerRushingStats(db *sql.DB, playerName string) (models.NFLPlayerRushi
 	return playerRushingStats, nil
 }
 
-
 func GetPlayerPassingStats(db *sql.DB, playerName string) (models.NFLPlayerPassingStats, error) {
 	query := `
 		SELECT 
@@ -151,20 +150,20 @@ func GetPlayerPassingStats(db *sql.DB, playerName string) (models.NFLPlayerPassi
 
 	var playerPassingStats models.NFLPlayerPassingStats
 	err := db.QueryRow(query, playerName).Scan(
-		&playerPassingStats.AvgGain,               // avgGain
-		&playerPassingStats.CompletionPct,         // completionPct
-		&playerPassingStats.Completions,           // completions
-		&playerPassingStats.InterceptionPct,       // interceptionPct
-		&playerPassingStats.Interceptions,         // interceptions
-		&playerPassingStats.LongPassing,           // longPassing
-		&playerPassingStats.NetPassingYards,       // netPassingYards
-		&playerPassingStats.NetPassingYardsPerGame,// netPassingYardsPerGame
-		&playerPassingStats.NetTotalYards,         // netTotalYards
-		&playerPassingStats.NetYardsPerGame,       // netYardsPerGame
-		&playerPassingStats.PassingAttempts,       // passingAttempts
-		&playerPassingStats.PassingYards,          // passingYards
-		&playerPassingStats.TotalOffensivePlays,   // totalOffensivePlays
-		&playerPassingStats.PlayerName,            // player_name
+		&playerPassingStats.AvgGain,                // avgGain
+		&playerPassingStats.CompletionPct,          // completionPct
+		&playerPassingStats.Completions,            // completions
+		&playerPassingStats.InterceptionPct,        // interceptionPct
+		&playerPassingStats.Interceptions,          // interceptions
+		&playerPassingStats.LongPassing,            // longPassing
+		&playerPassingStats.NetPassingYards,        // netPassingYards
+		&playerPassingStats.NetPassingYardsPerGame, // netPassingYardsPerGame
+		&playerPassingStats.NetTotalYards,          // netTotalYards
+		&playerPassingStats.NetYardsPerGame,        // netYardsPerGame
+		&playerPassingStats.PassingAttempts,        // passingAttempts
+		&playerPassingStats.PassingYards,           // passingYards
+		&playerPassingStats.TotalOffensivePlays,    // totalOffensivePlays
+		&playerPassingStats.PlayerName,             // player_name
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -338,7 +337,7 @@ func GetRushingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 	if err = rows.Err(); err != nil {
 		return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats]{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
 	}
-	return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats] {
+	return models.NFLPlayerGamelogCollection[models.NFLPlayerRushingReceivingGamelogStats]{
 		Games: games,
 	}, nil
 }
@@ -410,7 +409,7 @@ func GetPassingGameStats(db *sql.DB, playerName string) (models.NFLPlayerGamelog
 	if err = rows.Err(); err != nil {
 		return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats]{}, fmt.Errorf("error iterating over gamelog stats rows: %w", err)
 	}
-	return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats] {
+	return models.NFLPlayerGamelogCollection[models.NFLPlayerPassingGamelogStats]{
 		Games: games,
 	}, nil
 }
@@ -423,7 +422,9 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 			sumer."sack_%_rank",
 			sumer."epa/play",
 			sumer."success_%",
+			tds."Rush EPA",
 			tds.rush_success_rate_allowed,
+			tds."Dropback EPA",
 			tds.dropback_success_rate_allowed,
 			sumer."epa/play_rank",
 			sumer."success_%_rank",

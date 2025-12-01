@@ -22,17 +22,17 @@ type Team struct {
 
 // GameStats represents player game statistics
 type NBAGameStats struct {
-	Points           float64 `json:"points"`
-	Assists          float64 `json:"assists"`
-	Rebounds         float64 `json:"rebounds"`
+	Points            float64 `json:"points"`
+	Assists           float64 `json:"assists"`
+	Rebounds          float64 `json:"rebounds"`
 	ThreePointersMade float64 `json:"threePointersMade"`
-	Minutes          float64 `json:"minutes"`
+	Minutes           float64 `json:"minutes"`
 }
 
 // PlayerGameLog represents a player's game log entry
 type NBAPlayerGameLog struct {
-	GameDate string     `json:"game_date"`
-	Stats    NBAGameStats  `json:"stats"`
+	GameDate string       `json:"game_date"`
+	Stats    NBAGameStats `json:"stats"`
 }
 
 // TeamGameLog represents a team's game log entry
@@ -43,61 +43,60 @@ type TeamGameLog struct {
 
 // Game represents a live game
 type Game struct {
-	GameID    string `json:"game_id"`
-	HomeTeam  string `json:"home_team"`
-	AwayTeam  string `json:"away_team"`
-	HomeScore int    `json:"home_score"`
-	AwayScore int    `json:"away_score"`
-	Status    string `json:"status"`
+	GameID   string `json:"game_id"`
+	HomeCity string `json:"home_city"`
+	HomeTeam string `json:"home_team"`
+	AwayCity string `json:"away_city"`
+	AwayTeam string `json:"away_team"`
 }
 
 // TeamDefenseStats represents team defensive statistics
 type NBATeamDefenseStats struct {
-	TeamName           string  `json:"team_name"`
-	OppFgaRank         int     `json:"opp_fga_rank"`
-	OppFga             float64 `json:"opp_fga"`
-	OppFgPctRank       int     `json:"opp_fg_pct_rank"`
-	OppFgPct           float64 `json:"opp_fg_pct"`
-	OppFtaRank         int     `json:"opp_fta_rank"`
-	OppFta             float64 `json:"opp_fta"`
-	OppFtPctRank       int     `json:"opp_ft_pct_rank"`
-	OppFtPct           float64 `json:"opp_ft_pct"`
-	OppRebRank         int     `json:"opp_reb_rank"`
-	OppReb             float64 `json:"opp_reb"`
-	OppAstRank         int     `json:"opp_ast_rank"`
-	OppAst             float64 `json:"opp_ast"`
-	OppFg3aRank        int     `json:"opp_fg3a_rank"`
-	OppFg3a            float64 `json:"opp_fg3a"`
-	OppFg3Pct          float64 `json:"opp_fg3_pct"`
-	DefRatingRank      int     `json:"def_rating_rank"`
-	DefRating          float64 `json:"def_rating"`
-	OppPtsPaintRank    int     `json:"opp_pts_paint_rank"`
-	OppPtsPaint        float64 `json:"opp_pts_paint"`
-	PaceRank           int     `json:"pace_rank"`
-	Pace               float64 `json:"pace"`
-	OppEfgPctRank      int     `json:"opp_efg_pct_rank"`
-	OppEfgPct          float64 `json:"opp_efg_pct"`
-	OppFtaRateRank     int     `json:"opp_fta_rate_rank"`
-	OppFtaRate         float64 `json:"opp_fta_rate"`
-	OppOrebPctRank     int     `json:"opp_oreb_pct_rank"`
-	OppOrebPct         float64 `json:"opp_oreb_pct"`
+	TeamName        string  `json:"team_name"`
+	OppFgaRank      int     `json:"opp_fga_rank"`
+	OppFga          float64 `json:"opp_fga"`
+	OppFgPctRank    int     `json:"opp_fg_pct_rank"`
+	OppFgPct        float64 `json:"opp_fg_pct"`
+	OppFtaRank      int     `json:"opp_fta_rank"`
+	OppFta          float64 `json:"opp_fta"`
+	OppFtPctRank    int     `json:"opp_ft_pct_rank"`
+	OppFtPct        float64 `json:"opp_ft_pct"`
+	OppRebRank      int     `json:"opp_reb_rank"`
+	OppReb          float64 `json:"opp_reb"`
+	OppAstRank      int     `json:"opp_ast_rank"`
+	OppAst          float64 `json:"opp_ast"`
+	OppFg3aRank     int     `json:"opp_fg3a_rank"`
+	OppFg3a         float64 `json:"opp_fg3a"`
+	OppFg3Pct       float64 `json:"opp_fg3_pct"`
+	DefRatingRank   int     `json:"def_rating_rank"`
+	DefRating       float64 `json:"def_rating"`
+	OppPtsPaintRank int     `json:"opp_pts_paint_rank"`
+	OppPtsPaint     float64 `json:"opp_pts_paint"`
+	PaceRank        int     `json:"pace_rank"`
+	Pace            float64 `json:"pace"`
+	OppEfgPctRank   int     `json:"opp_efg_pct_rank"`
+	OppEfgPct       float64 `json:"opp_efg_pct"`
+	OppFtaRateRank  int     `json:"opp_fta_rate_rank"`
+	OppFtaRate      float64 `json:"opp_fta_rate"`
+	OppOrebPctRank  int     `json:"opp_oreb_pct_rank"`
+	OppOrebPct      float64 `json:"opp_oreb_pct"`
 }
 
 // PlayerShootingSplits represents player shooting statistics
 type NBAPlayerShootingSplits struct {
-	PlayerName     string  `json:"player_name"`
-	Fg2a           float64 `json:"fg2a"`
-	Fg2m           float64 `json:"fg2m"`
-	Fg2Pct         float64 `json:"fg2_pct"`
-	Fg3a           float64 `json:"fg3a"`
-	Fg3m           float64 `json:"fg3m"`
-	Fg3Pct         float64 `json:"fg3_pct"`
-	Fga            float64 `json:"fga"`
-	Fgm            float64 `json:"fgm"`
-	FgPct          float64 `json:"fg_pct"`
-	EfgPct         float64 `json:"efg_pct"`
-	Fg2aFrequency  float64 `json:"fg2a_frequency"`
-	Fg3aFrequency  float64 `json:"fg3a_frequency"`
+	PlayerName    string  `json:"player_name"`
+	Fg2a          float64 `json:"fg2a"`
+	Fg2m          float64 `json:"fg2m"`
+	Fg2Pct        float64 `json:"fg2_pct"`
+	Fg3a          float64 `json:"fg3a"`
+	Fg3m          float64 `json:"fg3m"`
+	Fg3Pct        float64 `json:"fg3_pct"`
+	Fga           float64 `json:"fga"`
+	Fgm           float64 `json:"fgm"`
+	FgPct         float64 `json:"fg_pct"`
+	EfgPct        float64 `json:"efg_pct"`
+	Fg2aFrequency float64 `json:"fg2a_frequency"`
+	Fg3aFrequency float64 `json:"fg3a_frequency"`
 }
 
 // PlayerHeadlineStats represents player headline statistics
@@ -109,26 +108,26 @@ type NBAPlayerHeadlineStats struct {
 }
 
 type NBAPlayerShotChartStats struct {
-	LocX            int    `json:"loc_x"`
-	LocY            int    `json:"loc_y"`
-	ShotMadeFlag    int    `json:"shot_made_flag"`
-	Opponent        string `json:"opponent"`
+	LocX         int    `json:"loc_x"`
+	LocY         int    `json:"loc_y"`
+	ShotMadeFlag int    `json:"shot_made_flag"`
+	Opponent     string `json:"opponent"`
 }
 
 type NBAPlayerAvgShotChartStats struct {
-	ShotZoneBasic string `json:"shot_zone_basic"`
-	ShotZoneArea string `json:"shot_zone_area"`
-	Attempts int `json:"attempts"`
-	Made int `json:"made"`
-	FgPct float64 `json:"fg_pct"`
+	ShotZoneBasic string  `json:"shot_zone_basic"`
+	ShotZoneArea  string  `json:"shot_zone_area"`
+	Attempts      int     `json:"attempts"`
+	Made          int     `json:"made"`
+	FgPct         float64 `json:"fg_pct"`
 }
 
 type ZoneValue struct {
 	FgPct  *float64 `json:"fg_pct,omitempty"`
 	Fgm    *float64 `json:"fgm,omitempty"`
 	Fga    *float64 `json:"fga,omitempty"`
-	FgRank *int     `json:"fg_rank"`  // <- no omitempty
-    OutOf  *int     `json:"out_of"`   // <- no omitempty
+	FgRank *int     `json:"fg_rank"` // <- no omitempty
+	OutOf  *int     `json:"out_of"`  // <- no omitempty
 }
 
 type OpponentZonesResponse struct {
@@ -180,7 +179,7 @@ type APIResponse struct {
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 	Error   string      `json:"error,omitempty"`
-} 
+}
 
 type NFLPlayer struct {
 	PlayerName string `json:"player_name"`
@@ -188,33 +187,33 @@ type NFLPlayer struct {
 }
 
 type NFLPlayerRushingStats struct {
-	AvgGain                  float64 `json:"avgGain"`
-	LongRushing              int     `json:"longRushing"`
-	NetTotalYards            int     `json:"netTotalYards"`
-	NetYardsPerGame          float64 `json:"netYardsPerGame"`
-	RushingAttempts          int     `json:"rushingAttempts"`
-	RushingBigPlays          int     `json:"rushingBigPlays"`
-	RushingFirstDowns        int     `json:"rushingFirstDowns"`
-	RushingFumbles           int     `json:"rushingFumbles"`
-	RushingFumblesLost       int     `json:"rushingFumblesLost"`
-	RushingTouchdowns        int     `json:"rushingTouchdowns"`
-	RushingYards             int     `json:"rushingYards"`
-	RushingYardsPerGame      float64 `json:"rushingYardsPerGame"`
-	Stuffs                   int     `json:"stuffs"`
-	StuffYardsLost           int     `json:"stuffYardsLost"`
-	TeamGamesPlayed          int     `json:"teamGamesPlayed"`
-	TotalOffensivePlays      int     `json:"totalOffensivePlays"`
-	TotalPointsPerGame       float64 `json:"totalPointsPerGame"`
-	TotalTouchdowns          int     `json:"totalTouchdowns"`
-	TotalYards               int     `json:"totalYards"`
-	TotalYardsFromScrimmage  int     `json:"totalYardsFromScrimmage"`
-	TwoPointRushConvs        int     `json:"twoPointRushConvs"`
-	TwoPtRush                int     `json:"twoPtRush"`
-	TwoPtRushAttempts        int     `json:"twoPtRushAttempts"`
+	AvgGain                   float64 `json:"avgGain"`
+	LongRushing               int     `json:"longRushing"`
+	NetTotalYards             int     `json:"netTotalYards"`
+	NetYardsPerGame           float64 `json:"netYardsPerGame"`
+	RushingAttempts           int     `json:"rushingAttempts"`
+	RushingBigPlays           int     `json:"rushingBigPlays"`
+	RushingFirstDowns         int     `json:"rushingFirstDowns"`
+	RushingFumbles            int     `json:"rushingFumbles"`
+	RushingFumblesLost        int     `json:"rushingFumblesLost"`
+	RushingTouchdowns         int     `json:"rushingTouchdowns"`
+	RushingYards              int     `json:"rushingYards"`
+	RushingYardsPerGame       float64 `json:"rushingYardsPerGame"`
+	Stuffs                    int     `json:"stuffs"`
+	StuffYardsLost            int     `json:"stuffYardsLost"`
+	TeamGamesPlayed           int     `json:"teamGamesPlayed"`
+	TotalOffensivePlays       int     `json:"totalOffensivePlays"`
+	TotalPointsPerGame        float64 `json:"totalPointsPerGame"`
+	TotalTouchdowns           int     `json:"totalTouchdowns"`
+	TotalYards                int     `json:"totalYards"`
+	TotalYardsFromScrimmage   int     `json:"totalYardsFromScrimmage"`
+	TwoPointRushConvs         int     `json:"twoPointRushConvs"`
+	TwoPtRush                 int     `json:"twoPtRush"`
+	TwoPtRushAttempts         int     `json:"twoPtRushAttempts"`
 	YardsFromScrimmagePerGame float64 `json:"yardsFromScrimmagePerGame"`
-	YardsPerGame             float64 `json:"yardsPerGame"`
-	YardsPerRushAttempt      float64 `json:"yardsPerRushAttempt"`
-	PlayerName               string  `json:"player_name"`
+	YardsPerGame              float64 `json:"yardsPerGame"`
+	YardsPerRushAttempt       float64 `json:"yardsPerRushAttempt"`
+	PlayerName                string  `json:"player_name"`
 }
 
 type NFLPlayerReceivingStats struct {
@@ -249,20 +248,20 @@ type NFLPlayerReceivingStats struct {
 }
 
 type NFLPlayerPassingStats struct {
-	AvgGain                  float64 `json:"avgGain"`
-	CompletionPct            float64 `json:"completionPct"`
-	Completions              int     `json:"completions"`
-	InterceptionPct          float64 `json:"interceptionPct"`
-	Interceptions            int     `json:"interceptions"`
-	LongPassing              int     `json:"longPassing"`
-	NetPassingYards          int     `json:"netPassingYards"`
-	NetPassingYardsPerGame   float64 `json:"netPassingYardsPerGame"`
-	NetTotalYards            int     `json:"netTotalYards"`
-	NetYardsPerGame          float64 `json:"netYardsPerGame"`
-	PassingAttempts          int     `json:"passingAttempts"`
-	PassingYards             int     `json:"passingYards"`
-	TotalOffensivePlays      int     `json:"totalOffensivePlays"`
-	PlayerName               string  `json:"player_name"`
+	AvgGain                float64 `json:"avgGain"`
+	CompletionPct          float64 `json:"completionPct"`
+	Completions            int     `json:"completions"`
+	InterceptionPct        float64 `json:"interceptionPct"`
+	Interceptions          int     `json:"interceptions"`
+	LongPassing            int     `json:"longPassing"`
+	NetPassingYards        int     `json:"netPassingYards"`
+	NetPassingYardsPerGame float64 `json:"netPassingYardsPerGame"`
+	NetTotalYards          int     `json:"netTotalYards"`
+	NetYardsPerGame        float64 `json:"netYardsPerGame"`
+	PassingAttempts        int     `json:"passingAttempts"`
+	PassingYards           int     `json:"passingYards"`
+	TotalOffensivePlays    int     `json:"totalOffensivePlays"`
+	PlayerName             string  `json:"player_name"`
 }
 
 type NFLEvent struct {
@@ -272,47 +271,46 @@ type NFLEvent struct {
 }
 
 type NFLPlayerRushingReceivingGamelogStats struct {
-	GameID string `json:"game_id"`
-	PlayerName string `json:"player_name"`
-	GameDate time.Time `json:"game_date"`
-	GameWeek int `json:"game_week"`
-	RushingAttempts int `json:"rushingAttempts"`
-	YardsPerRushAttempt float64 `json:"yardsPerRushAttempt"`
-	RushingYards int `json:"rushingYards"`
-	RushingTouchdowns int `json:"rushingTouchdowns"`
-	LongRushing int `json:"longRushing"`
-	Receptions int `json:"receptions"`
-	ReceivingTargets int `json:"receivingTargets"`
-	ReceivingYards int `json:"receivingYards"`
-	YardsPerReception float64 `json:"yardsPerReception"`
-	ReceivingTouchdowns int `json:"receivingTouchdowns"`
-	LongReception int `json:"longReception"`
-	Fumbles int `json:"fumbles"`
-	FumblesLost int `json:"fumblesLost"`
-	OffenseSnaps int `json:"offenseSnaps"`
-	OffenseSnapPct float64 `json:"offenseSnapPct"`
+	GameID              string    `json:"game_id"`
+	PlayerName          string    `json:"player_name"`
+	GameDate            time.Time `json:"game_date"`
+	GameWeek            int       `json:"game_week"`
+	RushingAttempts     int       `json:"rushingAttempts"`
+	YardsPerRushAttempt float64   `json:"yardsPerRushAttempt"`
+	RushingYards        int       `json:"rushingYards"`
+	RushingTouchdowns   int       `json:"rushingTouchdowns"`
+	LongRushing         int       `json:"longRushing"`
+	Receptions          int       `json:"receptions"`
+	ReceivingTargets    int       `json:"receivingTargets"`
+	ReceivingYards      int       `json:"receivingYards"`
+	YardsPerReception   float64   `json:"yardsPerReception"`
+	ReceivingTouchdowns int       `json:"receivingTouchdowns"`
+	LongReception       int       `json:"longReception"`
+	Fumbles             int       `json:"fumbles"`
+	FumblesLost         int       `json:"fumblesLost"`
+	OffenseSnaps        int       `json:"offenseSnaps"`
+	OffenseSnapPct      float64   `json:"offenseSnapPct"`
 }
 
-
 type NFLPlayerPassingGamelogStats struct {
-	GameID string `json:"game_id"`
-	PlayerName string `json:"player_name"`
-	GameDate time.Time `json:"game_date"`
-	GameWeek int `json:"game_week"`
-	RushingAttempts int `json:"rushingAttempts"`
-	YardsPerRushAttempt float64 `json:"yardsPerRushAttempt"`
-	RushingYards int `json:"rushingYards"`
-	RushingTouchdowns int `json:"rushingTouchdowns"`
-	LongRushing int `json:"longRushing"`
-	PassingAttempts int `json:"passingAttempts"`
-	PassingCompletions int `json:"passingCompletions"`
-	PassingYards int `json:"passingYards"`
-	PassingTouchdowns int `json:"passingTouchdowns"`
-	Interceptions int `json:"interceptions"`
-	QBRating float64 `json:"QBRating"`
-	YardsPerPassAttempt float64 `json:"yardsPerPassAttempt"`
-	OffenseSnaps int `json:"offenseSnaps"`
-	OffenseSnapPct float64 `json:"offenseSnapPct"`
+	GameID              string    `json:"game_id"`
+	PlayerName          string    `json:"player_name"`
+	GameDate            time.Time `json:"game_date"`
+	GameWeek            int       `json:"game_week"`
+	RushingAttempts     int       `json:"rushingAttempts"`
+	YardsPerRushAttempt float64   `json:"yardsPerRushAttempt"`
+	RushingYards        int       `json:"rushingYards"`
+	RushingTouchdowns   int       `json:"rushingTouchdowns"`
+	LongRushing         int       `json:"longRushing"`
+	PassingAttempts     int       `json:"passingAttempts"`
+	PassingCompletions  int       `json:"passingCompletions"`
+	PassingYards        int       `json:"passingYards"`
+	PassingTouchdowns   int       `json:"passingTouchdowns"`
+	Interceptions       int       `json:"interceptions"`
+	QBRating            float64   `json:"QBRating"`
+	YardsPerPassAttempt float64   `json:"yardsPerPassAttempt"`
+	OffenseSnaps        int       `json:"offenseSnaps"`
+	OffenseSnapPct      float64   `json:"offenseSnapPct"`
 }
 
 type NFLPlayerGamelogCollection[T any] struct {
@@ -320,79 +318,81 @@ type NFLPlayerGamelogCollection[T any] struct {
 }
 
 type NFLTeamDefenseStats struct {
-	TeamName string `json:"team_name"`
-	SacksRate string `json:"sacks_rate"`
-	SacksRateRank int `json:"sacks_rate_rank"`
-	EPAperPlayAllowed float64 `json:"epa_per_play_allowed"`
-	SuccessRateAllowed string `json:"success_rate_allowed"`
-	RushSuccessRateAllowed string `json:"rush_success_rate_allowed"`
-	DropbackSuccessRateAllowed string `json:"dropback_success_rate_allowed"`
-	EPAperPlayAllowedRank string `json:"epa_per_play_allowed_rank"`
-	SuccessRateAllowedRank string `json:"success_rate_allowed_rank"`
-	RushSuccessRateAllowedRank string `json:"rush_success_rate_allowed_rank"`
-	DropbackSuccessRateAllowedRank string `json:"dropback_success_rate_allowed_rank"`
-	ExplosivePlayRateAllowed float64 `json:"explosive_play_rate_allowed"`
-	ExplosivePlayRateAllowedRank string `json:"explosive_play_rate_allowed_rank"`
-	PressureRate float64 `json:"pressure_rate"`
-	PressureRateRank string `json:"pressure_rate_rank"`
-	BlitzRate float64 `json:"blitz_rate"`
-	BlitzRateRank string `json:"blitz_rate_rank"`
-	ManRate float64 `json:"man_rate"`
-	ManRateRank string `json:"man_rate_rank"`
-	ZoneRate float64 `json:"zone_rate"`
-	ZoneRateRank string `json:"zone_rate_rank"`
-	RushStuffRate float64 `json:"rush_stuff_rate"`
-	RushStuffRateRank string `json:"rush_stuff_rate_rank"`
-	YardsBeforeContactPerRbRush float64 `json:"yards_before_contact_per_rb_rush"`
-	YardsBeforeContactPerRbRushRank string `json:"yards_before_contact_per_rb_rush_rank"`
-	DownConversionRateAllowed float64 `json:"down_conversion_rate_allowed"`
-	DownConversionRateAllowedRank string `json:"down_conversion_rate_allowed_rank"`
-	YardsPerPlayAllowed float64 `json:"yards_per_play_allowed"`
-	YardsPerPlayAllowedRank string `json:"yards_per_play_allowed_rank"`
-	Adot float64 `json:"adot"`
-	AdotRank string `json:"adot_rank"`
-	ScrambleRate string `json:"scramble_rate"`
-	ScrambleRateRank string `json:"scramble_rate_rank"`
-	IntRate string `json:"int_rate"`
-	IntRateRank string `json:"int_rate_rank"`
+	TeamName                        string  `json:"team_name"`
+	SacksRate                       string  `json:"sacks_rate"`
+	SacksRateRank                   int     `json:"sacks_rate_rank"`
+	EPAperPlayAllowed               float64 `json:"epa_per_play_allowed"`
+	SuccessRateAllowed              string  `json:"success_rate_allowed"`
+	RushEPAAllowed                  float64 `json:"rush_epa_allowed"`
+	RushSuccessRateAllowed          string  `json:"rush_success_rate_allowed"`
+	DropbackEPAAllowed              string  `json:"dropback_epa_allowed"`
+	DropbackSuccessRateAllowed      string  `json:"dropback_success_rate_allowed"`
+	EPAperPlayAllowedRank           string  `json:"epa_per_play_allowed_rank"`
+	SuccessRateAllowedRank          string  `json:"success_rate_allowed_rank"`
+	RushSuccessRateAllowedRank      string  `json:"rush_success_rate_allowed_rank"`
+	DropbackSuccessRateAllowedRank  string  `json:"dropback_success_rate_allowed_rank"`
+	ExplosivePlayRateAllowed        float64 `json:"explosive_play_rate_allowed"`
+	ExplosivePlayRateAllowedRank    string  `json:"explosive_play_rate_allowed_rank"`
+	PressureRate                    float64 `json:"pressure_rate"`
+	PressureRateRank                string  `json:"pressure_rate_rank"`
+	BlitzRate                       float64 `json:"blitz_rate"`
+	BlitzRateRank                   string  `json:"blitz_rate_rank"`
+	ManRate                         float64 `json:"man_rate"`
+	ManRateRank                     string  `json:"man_rate_rank"`
+	ZoneRate                        float64 `json:"zone_rate"`
+	ZoneRateRank                    string  `json:"zone_rate_rank"`
+	RushStuffRate                   float64 `json:"rush_stuff_rate"`
+	RushStuffRateRank               string  `json:"rush_stuff_rate_rank"`
+	YardsBeforeContactPerRbRush     float64 `json:"yards_before_contact_per_rb_rush"`
+	YardsBeforeContactPerRbRushRank string  `json:"yards_before_contact_per_rb_rush_rank"`
+	DownConversionRateAllowed       float64 `json:"down_conversion_rate_allowed"`
+	DownConversionRateAllowedRank   string  `json:"down_conversion_rate_allowed_rank"`
+	YardsPerPlayAllowed             float64 `json:"yards_per_play_allowed"`
+	YardsPerPlayAllowedRank         string  `json:"yards_per_play_allowed_rank"`
+	Adot                            float64 `json:"adot"`
+	AdotRank                        string  `json:"adot_rank"`
+	ScrambleRate                    string  `json:"scramble_rate"`
+	ScrambleRateRank                string  `json:"scramble_rate_rank"`
+	IntRate                         string  `json:"int_rate"`
+	IntRateRank                     string  `json:"int_rate_rank"`
 }
 
 type NFLTeamOffenseStats struct {
-	TeamName string `json:"team_name"`
-	EPAperPlay float64 `json:"epa_per_play"`
-	SuccessRate string `json:"success_rate"`
-	RushSuccessRate string `json:"rush_success_rate"`
-	DropbackSuccessRate string `json:"dropback_success_rate"`
-	EPAperPlayRank int `json:"epa_per_play_rank"`
-	SuccessRateRank int `json:"success_rate_rank"`
-	RushSuccessRateRank int `json:"rush_success_rate_rank"`
-	DropbackSuccessRateRank int `json:"dropback_success_rate_rank"`
-	PassingYardsPerGame float64 `json:"passingYardsPerGame"`
-	PassingYardsPerGameRank int `json:"passingYardsPerGame_rank"`
-	YardsPerCompletion float64 `json:"yardsPerCompletion"`
-	YardsPerCompletionRank int `json:"yardsPerCompletion_rank"`
-	Sacks string `json:"sacks"`
-	SacksRank int `json:"sacks_rank"`
-	RushingAttempts float64 `json:"rushingAttempts"`
-	RushingAttemptsRank int `json:"rushingAttempts_rank"`
-	YardsPerRushAttempt float64 `json:"yardsPerRushAttempt"`
-	YardsPerRushAttemptRank int `json:"yardsPerRushAttempt_rank"`
-	PassingAttempts float64 `json:"passingAttempts"`
-	PassingAttemptsRank int `json:"passingAttempts_rank"`
-	Adot float64 `json:"adot"`
-	AdotRank int `json:"adot_rank"`
-	ScrambleRate string `json:"scramble_rate"`
-	ScrambleRateRank int `json:"scramble_rate_rank"`
-	IntRate string `json:"int_rate"`
-	IntRateRank int `json:"int_rate_rank"`
+	TeamName                string  `json:"team_name"`
+	EPAperPlay              float64 `json:"epa_per_play"`
+	SuccessRate             string  `json:"success_rate"`
+	RushSuccessRate         string  `json:"rush_success_rate"`
+	DropbackSuccessRate     string  `json:"dropback_success_rate"`
+	EPAperPlayRank          int     `json:"epa_per_play_rank"`
+	SuccessRateRank         int     `json:"success_rate_rank"`
+	RushSuccessRateRank     int     `json:"rush_success_rate_rank"`
+	DropbackSuccessRateRank int     `json:"dropback_success_rate_rank"`
+	PassingYardsPerGame     float64 `json:"passingYardsPerGame"`
+	PassingYardsPerGameRank int     `json:"passingYardsPerGame_rank"`
+	YardsPerCompletion      float64 `json:"yardsPerCompletion"`
+	YardsPerCompletionRank  int     `json:"yardsPerCompletion_rank"`
+	Sacks                   string  `json:"sacks"`
+	SacksRank               int     `json:"sacks_rank"`
+	RushingAttempts         float64 `json:"rushingAttempts"`
+	RushingAttemptsRank     int     `json:"rushingAttempts_rank"`
+	YardsPerRushAttempt     float64 `json:"yardsPerRushAttempt"`
+	YardsPerRushAttemptRank int     `json:"yardsPerRushAttempt_rank"`
+	PassingAttempts         float64 `json:"passingAttempts"`
+	PassingAttemptsRank     int     `json:"passingAttempts_rank"`
+	Adot                    float64 `json:"adot"`
+	AdotRank                int     `json:"adot_rank"`
+	ScrambleRate            string  `json:"scramble_rate"`
+	ScrambleRateRank        int     `json:"scramble_rate_rank"`
+	IntRate                 string  `json:"int_rate"`
+	IntRateRank             int     `json:"int_rate_rank"`
 }
 
 type NFLPassingPBPStats struct {
-	Week int `json:"week"`
-	Opponent string `json:"opponent"`
-	CompletePass int `json:"complete_pass"`
-	Interception int `json:"interception"`
-	AirYards int `json:"air_yards"`
+	Week         int    `json:"week"`
+	Opponent     string `json:"opponent"`
+	CompletePass int    `json:"complete_pass"`
+	Interception int    `json:"interception"`
+	AirYards     int    `json:"air_yards"`
 	PassLocation string `json:"pass_location"`
-	PassLength string `json:"pass_length"`
+	PassLength   string `json:"pass_length"`
 }

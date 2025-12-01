@@ -9,6 +9,29 @@ import (
 
 // NBA Database operations
 
+func GetScoreboard(db *sql.DB) ([]models.Game, error) {
+	query := `SELECT game_id, home_team_city, home_team_name, away_team_city, away_team_name FROM nba_data.scoreboard`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query Scoreboard: %w", err)
+	}
+	defer rows.Close()
+
+	var games []models.Game
+	for rows.Next() {
+		var game models.Game
+		err := rows.Scan(&game.GameID, &game.HomeCity, &game.HomeTeam, &game.AwayCity, &game.AwayTeam)
+		if err != nil {
+			return nil, fmt.Errorf("failed to game: %w", err)
+		}
+		games = append(games, game)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over NBA game rows: %w", err)
+	}
+	return games, nil
+}
+
 // GetNBAPlayersByTeam retrieves all players for a given NBA team
 func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	query := `
