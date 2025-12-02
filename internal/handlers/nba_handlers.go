@@ -188,6 +188,7 @@ func (h *NBAHandler) GetTeamRoster(c *gin.Context) {
 			"PLAYER":    player.PlayerName,
 			"NUM":       player.Number,
 			"POSITION":  player.Position,
+			"STATUS":    player.Status,
 		}
 	}
 

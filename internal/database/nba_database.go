@@ -35,9 +35,14 @@ func GetScoreboard(db *sql.DB) ([]models.Game, error) {
 // GetNBAPlayersByTeam retrieves all players for a given NBA team
 func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	query := `
-		SELECT PLAYER_ID, PLAYER, "POSITION", TEAM, NUM 
-		FROM nba_data.team_roster 
-		WHERE TEAM = ? 
+		SELECT PLAYER_ID, PLAYER, "POSITION", tr.TEAM, NUM, COALESCE(nis."Current Status", '') as current_status
+		FROM nba_data.team_roster tr
+		LEFT JOIN (
+			SELECT "Player Name", "Current Status"
+			FROM nba_data.nba_injuries_status
+			WHERE ingested_date = (SELECT MAX(ingested_date) FROM nba_data.nba_injuries_status)
+		) nis ON nis."Player Name" = tr.PLAYER   
+		WHERE tr.TEAM = ? 
 		ORDER BY PLAYER
 	`
 
@@ -50,7 +55,7 @@ func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	var players []models.Player
 	for rows.Next() {
 		var player models.Player
-		err := rows.Scan(&player.PlayerID, &player.PlayerName, &player.Position, &player.TeamID, &player.Number)
+		err := rows.Scan(&player.PlayerID, &player.PlayerName, &player.Position, &player.TeamID, &player.Number, &player.Status)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan NBA player row: %w", err)
 		}

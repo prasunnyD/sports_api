@@ -10,6 +10,7 @@ type Player struct {
 	TeamName   string `json:"team_name"`
 	TeamID     string `json:"team_id"`
 	Number     string `json:"number"`
+	Status     string `json:"status"`
 }
 
 // Team represents an NBA team
