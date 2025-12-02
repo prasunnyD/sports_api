@@ -184,9 +184,10 @@ func (h *NBAHandler) GetTeamRoster(c *gin.Context) {
 	roster := make([]map[string]string, len(players))
 	for i, player := range players {
 		roster[i] = map[string]string{
-			"PLAYER":   player.PlayerName,
-			"NUM":      player.Number,
-			"POSITION": player.Position,
+			"PLAYER_ID": player.PlayerID,
+			"PLAYER":    player.PlayerName,
+			"NUM":       player.Number,
+			"POSITION":  player.Position,
 		}
 	}
 
