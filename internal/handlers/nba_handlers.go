@@ -477,3 +477,24 @@ func (h *NBAHandler) GetOpponentShootingByZone(c *gin.Context) {
 		Data:   resp,
 	})
 }
+
+func (h *NBAHandler) GetOdds(c *gin.Context) {
+	name := c.Param("name")
+
+	if strings.TrimSpace(name) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Name is required",
+		})
+		return
+	}
+
+	odds, err := database.GetOdds(h.db, name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve odds",
+			"details": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, odds)
+}

@@ -418,3 +418,12 @@ type NFLPassingPBPStats struct {
 	PassLocation string `json:"pass_location"`
 	PassLength   string `json:"pass_length"`
 }
+
+type Odds struct {
+	Name      string  `json:"name"`
+	Market    string  `json:"market"`
+	Sportbook string  `json:"sportbook"`
+	Line      float32 `json:"line"`
+	Over      int     `json:"over"`
+	Under     int     `json:"under"`
+}

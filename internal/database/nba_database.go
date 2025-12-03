@@ -37,13 +37,17 @@ func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	query := `
 		SELECT PLAYER_ID, PLAYER, "POSITION", tr.TEAM, NUM, COALESCE(nis."Current Status", '') as current_status
 		FROM nba_data.team_roster tr
-		LEFT JOIN (
-			SELECT "Player Name", "Current Status"
-			FROM nba_data.nba_injuries_status
-			WHERE ingested_date = (SELECT MAX(ingested_date) FROM nba_data.nba_injuries_status)
-		) nis ON nis."Player Name" = tr.PLAYER   
-		WHERE tr.TEAM = ? 
-		ORDER BY PLAYER
+		left join(SELECT 
+			"Player Name",
+			"Current Status",
+		FROM nba_data.nba_injuries_status t1
+		WHERE ingested_date = (
+			SELECT MAX(ingested_date)
+			FROM nba_data.nba_injuries_status t2
+			WHERE t2.Team = t1.Team
+		)) nis ON nis."Player Name" = tr.PLAYER 
+		WHERE tr.TEAM = ?
+		order by PLAYER;
 	`
 
 	rows, err := db.Query(query, teamCity)
@@ -526,4 +530,27 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
 		Season: season,
 		Zones:  zones,
 	}, nil
+}
+
+func GetOdds(db *sql.DB, name string) ([]models.Odds, error) {
+	query := `Select player, sport_book, market, line, over_odds, under_odds FROM nba_data.nba_prop_odds where sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ?`
+	rows, err := db.Query(query, name)
+	if err != nil {
+		return nil, fmt.Errorf("error querying odds: %w", err)
+	}
+	defer rows.Close()
+	var odds []models.Odds
+	for rows.Next() {
+		var odd models.Odds
+		err := rows.Scan(&odd.Name, &odd.Sportbook, &odd.Market, &odd.Line, &odd.Over, &odd.Under)
+		if err != nil {
+			return nil, fmt.Errorf("error in odds: %w", err)
+		}
+		odds = append(odds, odd)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over player odds rows: %w", err)
+	}
+
+	return odds, nil
 }
