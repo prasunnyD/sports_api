@@ -532,9 +532,9 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
 	}, nil
 }
 
-func GetOdds(db *sql.DB, name string) ([]models.Odds, error) {
-	query := `Select player, sport_book, market, line, over_odds, under_odds FROM nba_data.nba_prop_odds where sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ?`
-	rows, err := db.Query(query, name)
+func GetOdds(db *sql.DB, name string, market string) ([]models.Odds, error) {
+	query := `Select player, sport_book, market, line, over_odds, under_odds FROM nba_data.nba_prop_odds where sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ? and market = ?`
+	rows, err := db.Query(query, name, market)
 	if err != nil {
 		return nil, fmt.Errorf("error querying odds: %w", err)
 	}
