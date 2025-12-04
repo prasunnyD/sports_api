@@ -346,8 +346,10 @@ type NFLTeamDefenseStats struct {
 	EPAperPlayAllowed               float64 `json:"epa_per_play_allowed"`
 	SuccessRateAllowed              string  `json:"success_rate_allowed"`
 	RushEPAAllowed                  float64 `json:"rush_epa_allowed"`
+	RushEPAAllowedRank              int     `json:"rush_epa_allowed_rank"`
 	RushSuccessRateAllowed          string  `json:"rush_success_rate_allowed"`
 	DropbackEPAAllowed              string  `json:"dropback_epa_allowed"`
+	DropbackEPAAllowedRank          int     `json:"dropback_epa_allowed_rank"`
 	DropbackSuccessRateAllowed      string  `json:"dropback_success_rate_allowed"`
 	EPAperPlayAllowedRank           string  `json:"epa_per_play_allowed_rank"`
 	SuccessRateAllowedRank          string  `json:"success_rate_allowed_rank"`
@@ -382,6 +384,10 @@ type NFLTeamDefenseStats struct {
 type NFLTeamOffenseStats struct {
 	TeamName                string  `json:"team_name"`
 	EPAperPlay              float64 `json:"epa_per_play"`
+	DropbackEPA             float64 `json:"dropback_epa"`
+	DropbackEPARank         int     `json:"dropback_epa_rank"`
+	RushEPA                 float64 `json:"rush_epa"`
+	RushEPARank             int     `json:"rush_epa_rank"`
 	SuccessRate             string  `json:"success_rate"`
 	RushSuccessRate         string  `json:"rush_success_rate"`
 	DropbackSuccessRate     string  `json:"dropback_success_rate"`
