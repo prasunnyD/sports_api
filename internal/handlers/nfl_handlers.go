@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"database/sql"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
-	"log/slog"
+
+	"sports_api/internal/database"
 
 	"github.com/gin-gonic/gin"
-	"sports_api/internal/database"
 )
 
 // PlayerHandler handles NFL player-related HTTP requests
@@ -24,7 +25,7 @@ func NewPlayerHandler(db *sql.DB) *PlayerHandler {
 // GetPlayersByTeam retrieves all players for a given NFL team
 func (h *PlayerHandler) GetPlayersByTeam(c *gin.Context) {
 	teamName := c.Param("team")
-	
+
 	// Validate team name
 	if strings.TrimSpace(teamName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -37,7 +38,7 @@ func (h *PlayerHandler) GetPlayersByTeam(c *gin.Context) {
 	players, err := database.GetPlayersByTeam(h.db, teamName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve players",
+			"error":   "Failed to retrieve players",
 			"details": err.Error(),
 		})
 		return
@@ -57,7 +58,7 @@ func (h *PlayerHandler) GetAllTeams(c *gin.Context) {
 	teams, err := database.GetAllTeams(h.db)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve teams",
+			"error":   "Failed to retrieve teams",
 			"details": err.Error(),
 		})
 		return
@@ -68,11 +69,11 @@ func (h *PlayerHandler) GetAllTeams(c *gin.Context) {
 		"count": len(teams),
 		"teams": teams,
 	})
-} 
+}
 
 func (h *PlayerHandler) GetPlayerRushingStats(c *gin.Context) {
 	playerName := c.Param("player")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -85,12 +86,12 @@ func (h *PlayerHandler) GetPlayerRushingStats(c *gin.Context) {
 	stats, err := database.GetPlayerRushingStats(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player rushing stats",
+			"error":   "Failed to retrieve player rushing stats",
 			"details": err.Error(),
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
 		"stats":  stats,
@@ -99,7 +100,7 @@ func (h *PlayerHandler) GetPlayerRushingStats(c *gin.Context) {
 
 func (h *PlayerHandler) GetPlayerReceivingStats(c *gin.Context) {
 	playerName := c.Param("player")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -112,12 +113,12 @@ func (h *PlayerHandler) GetPlayerReceivingStats(c *gin.Context) {
 	stats, err := database.GetPlayerReceivingStats(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player receiving stats",
+			"error":   "Failed to retrieve player receiving stats",
 			"details": err.Error(),
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
 		"stats":  stats,
@@ -126,7 +127,7 @@ func (h *PlayerHandler) GetPlayerReceivingStats(c *gin.Context) {
 
 func (h *PlayerHandler) GetPlayerPassingStats(c *gin.Context) {
 	playerName := c.Param("player")
-	
+
 	// Validate player name
 	if strings.TrimSpace(playerName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -139,12 +140,12 @@ func (h *PlayerHandler) GetPlayerPassingStats(c *gin.Context) {
 	stats, err := database.GetPlayerPassingStats(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player passing stats",
+			"error":   "Failed to retrieve player passing stats",
 			"details": err.Error(),
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
 		"stats":  stats,
@@ -164,7 +165,7 @@ func (h *PlayerHandler) GetRushingGameStats(c *gin.Context) {
 	stats, err := database.GetRushingGameStats(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player rushing game stats",
+			"error":   "Failed to retrieve player rushing game stats",
 			"details": err.Error(),
 		})
 		return
@@ -188,7 +189,7 @@ func (h *PlayerHandler) GetPassingGameStats(c *gin.Context) {
 	stats, err := database.GetPassingGameStats(h.db, playerName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve player passing game stats",
+			"error":   "Failed to retrieve player passing game stats",
 			"details": err.Error(),
 		})
 		return
@@ -204,7 +205,7 @@ func (h *PlayerHandler) GetTeamDefenseStats(c *gin.Context) {
 	stats, err := database.GetNFLTeamDefenseStats(h.db, teamName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve team defense stats",
+			"error":   "Failed to retrieve team defense stats",
 			"details": err.Error(),
 		})
 	}
@@ -218,7 +219,7 @@ func (h *PlayerHandler) GetTeamOffenseStats(c *gin.Context) {
 	stats, err := database.GetNFLTeamOffenseStats(h.db, teamName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve team defense stats",
+			"error":   "Failed to retrieve team defense stats",
 			"details": err.Error(),
 		})
 	}
@@ -233,7 +234,7 @@ func (h *PlayerHandler) GetNFLPassingPBPStats(c *gin.Context) {
 	season, err := strconv.Atoi(seasonStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid season parameter",
+			"error":   "Invalid season parameter",
 			"details": err.Error(),
 		})
 		return
@@ -241,7 +242,7 @@ func (h *PlayerHandler) GetNFLPassingPBPStats(c *gin.Context) {
 	stats, err := database.GetNFLPassingPBPStats(h.db, playerName, season)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve passing PBP stats",
+			"error":   "Failed to retrieve passing PBP stats",
 			"details": err.Error(),
 		})
 		return
@@ -249,6 +250,28 @@ func (h *PlayerHandler) GetNFLPassingPBPStats(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"player": playerName,
 		"season": season,
-		"stats": stats,
+		"stats":  stats,
 	})
+}
+
+func (h *PlayerHandler) GetNFLPropOdds(c *gin.Context) {
+	name := c.Param("name")
+	market := c.Param("market")
+
+	if strings.TrimSpace(name) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Name is required",
+		})
+		return
+	}
+
+	odds, err := database.GetNFLPropOdds(h.db, name, market)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve odds",
+			"details": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, odds)
 }

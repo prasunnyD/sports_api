@@ -3,8 +3,9 @@ package routes
 import (
 	"database/sql"
 
-	"github.com/gin-gonic/gin"
 	"sports_api/internal/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SetupNFLRoutes configures all NFL-related routes
@@ -24,5 +25,6 @@ func SetupNFLRoutes(router *gin.RouterGroup, db *sql.DB) {
 		nfl.GET("/team-defense-stats/:team", playerHandler.GetTeamDefenseStats)
 		nfl.GET("/team-offense-stats/:team", playerHandler.GetTeamOffenseStats)
 		nfl.GET("/players/:player/passing-pbp-stats/:season", playerHandler.GetNFLPassingPBPStats)
+		nfl.GET("/odds/:market/:name", playerHandler.GetNFLPropOdds)
 	}
-} 
+}
