@@ -532,8 +532,21 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.
 	}, nil
 }
 
-func GetOdds(db *sql.DB, name string, market string) ([]models.Odds, error) {
-	query := `Select player, sport_book, market, line, over_odds, under_odds FROM nba_data.nba_prop_odds where sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ? and market = ?`
+func GetPropOdds(db *sql.DB, name string, market string) ([]models.Odds, error) {
+	query := `SELECT 
+				player,
+				sport_book,
+				market,
+				line,
+				over_odds,
+				under_odds
+			FROM nba_data.nba_prop_odds t1
+			WHERE "timestamp" = (
+				SELECT MAX("timestamp")
+				FROM nba_data.nba_prop_odds t2
+				WHERE t2.sport_book = t1.sport_book 
+				AND t2.player = t1.player
+			) and sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ? and market = ?`
 	rows, err := db.Query(query, name, market)
 	if err != nil {
 		return nil, fmt.Errorf("error querying odds: %w", err)
@@ -552,5 +565,38 @@ func GetOdds(db *sql.DB, name string, market string) ([]models.Odds, error) {
 		return nil, fmt.Errorf("error iterating over player odds rows: %w", err)
 	}
 
+	return odds, nil
+}
+
+func GetMoneylineOdds(db *sql.DB, team string) ([]models.MoneylineOdds, error) {
+	query := `SELECT
+        		team,
+				sport_book,
+				price,
+			FROM nba_data.nba_moneyline_odds t1
+			WHERE "timestamp" = (
+				SELECT MAX("timestamp")
+				FROM nba_data.nba_moneyline_odds t2
+				WHERE t2.sport_book = t1.sport_book 
+				AND t2.team = t1.team)
+			AND sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') AND team= ?`
+
+	rows, err := db.Query(query, team)
+	defer rows.Close()
+	var odds []models.MoneylineOdds
+	if err != nil {
+		return nil, fmt.Errorf("error querying odds: %w", err)
+	}
+	for rows.Next() {
+		var odd models.MoneylineOdds
+		err := rows.Scan(&odd.Team, &odd.Sportbook, &odd.Price)
+		if err != nil {
+			return nil, fmt.Errorf("error in odds: %w", err)
+		}
+		odds = append(odds, odd)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over player odds rows: %w", err)
+	}
 	return odds, nil
 }

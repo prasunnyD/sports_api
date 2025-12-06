@@ -433,3 +433,9 @@ type Odds struct {
 	Over      int     `json:"over"`
 	Under     int     `json:"under"`
 }
+
+type MoneylineOdds struct {
+	Team      string `json:"team"`
+	Sportbook string `json:"sportbook"`
+	Price     string `json:price`
+}

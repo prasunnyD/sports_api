@@ -478,7 +478,7 @@ func (h *NBAHandler) GetOpponentShootingByZone(c *gin.Context) {
 	})
 }
 
-func (h *NBAHandler) GetOdds(c *gin.Context) {
+func (h *NBAHandler) GetPropOdds(c *gin.Context) {
 	name := c.Param("name")
 	market := c.Param("market")
 
@@ -489,7 +489,28 @@ func (h *NBAHandler) GetOdds(c *gin.Context) {
 		return
 	}
 
-	odds, err := database.GetOdds(h.db, name, market)
+	odds, err := database.GetPropOdds(h.db, name, market)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve odds",
+			"details": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, odds)
+}
+
+func (h *NBAHandler) GetMoneylineOdds(c *gin.Context) {
+	team := c.Param("team")
+
+	if strings.TrimSpace(team) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Name is required",
+		})
+		return
+	}
+
+	odds, err := database.GetMoneylineOdds(h.db, team)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Failed to retrieve odds",
