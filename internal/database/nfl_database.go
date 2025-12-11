@@ -647,10 +647,10 @@ func GetNFLPropOdds(db *sql.DB, name string, market string) ([]models.Odds, erro
 				line,
 				over_odds,
 				under_odds
-			FROM nba_data.nfl_prop_odds t1
+			FROM nfl_data.nfl_prop_odds t1
 			WHERE "timestamp" = (
 				SELECT MAX("timestamp")
-				FROM nba_data.nfl_prop_odds t2
+				FROM nfl_data.nfl_prop_odds t2
 				WHERE t2.sport_book = t1.sport_book 
 				AND t2.player = t1.player
 			) and sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ? and market = ?`
