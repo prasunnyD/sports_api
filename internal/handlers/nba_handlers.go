@@ -434,37 +434,19 @@ func (h *NBAHandler) GetPlayerAvgShotChartStats(c *gin.Context) {
 
 func (h *NBAHandler) GetOpponentShootingByZone(c *gin.Context) {
 	// 1) path params
-	team := strings.TrimSpace(c.Param("team"))
-	if team == "" {
-		team = strings.TrimSpace(c.Param("opponent")) // <-- your routes use this
-	}
+	opponent := strings.TrimSpace(c.Param("opponent"))
 	season := strings.TrimSpace(c.Param("season"))
-
-	// 2) query params as fallback / alias
-	if team == "" {
-		team = strings.TrimSpace(c.Query("team"))
-	}
-	if team == "" {
-		team = strings.TrimSpace(c.Query("opponent"))
-	}
-	if season == "" {
-		season = strings.TrimSpace(c.Query("season"))
-	}
-
-	if season == "" {
-		season = "2024-25"
-	}
-	if team == "" {
-		c.JSON(400, models.APIResponse{
+	if opponent == "" {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
 			Status:  "error",
 			Message: "missing team/opponent (use path /:opponent or query ?team= / ?opponent=)",
 		})
 		return
 	}
 
-	resp, err := database.GetOpponentZonesByTeamSeason(h.db, team, season)
+	zones, err := database.GetOpponentZonesByTeamSeason(h.db, opponent, season)
 	if err != nil {
-		c.JSON(500, models.APIResponse{
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
 			Status:  "error",
 			Message: "failed to load opponent zones",
 			Error:   err.Error(),
@@ -472,9 +454,10 @@ func (h *NBAHandler) GetOpponentShootingByZone(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, models.APIResponse{
-		Status: "ok",
-		Data:   resp,
+	c.JSON(http.StatusOK, gin.H{
+		"Opponent": opponent,
+		"Season":   season,
+		"Zones":    zones,
 	})
 }
 

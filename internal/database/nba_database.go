@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"os"
 	"sports_api/internal/models"
 )
 
@@ -383,15 +382,16 @@ func GetTeamIDByName(db *sql.DB, teamName string) (string, error) {
 func GetPlayerShotChartStats(db *sql.DB, playerName string, seasonID string) ([]models.NBAPlayerShotChartStats, error) {
 	query := `
 		SELECT
+		  psr.GAME_DATE,
           psr.LOC_X AS x,
           psr.LOC_Y AS y,
-          psr.SHOT_MADE_FLAG::INT AS made,
+          psr.SHOT_MADE_FLAG,
 		  pb.OPPONENT as opponent
-        FROM nba_data.player_shotchart_raw psr
+        FROM nba_data.player_shotchart psr
 		JOIN nba_data.player_boxscores pb on psr.player_id = pb.player_id and psr.game_id = pb.GAME_ID
-		JOIN nba_data.team_roster tr on psr.player_id = tr.player_id
+		JOIN nba_data.team_roster tr on psr.player_id = tr.PLAYER_ID
         WHERE tr.PLAYER = ?
-          AND psr.SEASON_ID = ?
+          AND psr.SEASON = ?
           AND psr.LOC_X BETWEEN -250 AND 250
           AND psr.LOC_Y BETWEEN -50 AND 470
 	`
@@ -407,6 +407,7 @@ func GetPlayerShotChartStats(db *sql.DB, playerName string, seasonID string) ([]
 	for rows.Next() {
 		var shot models.NBAPlayerShotChartStats
 		err := rows.Scan(
+			&shot.GameDate,
 			&shot.LocX,
 			&shot.LocY,
 			&shot.ShotMadeFlag,
@@ -433,11 +434,11 @@ func GetPlayerAvgShotChartStats(db *sql.DB, playerName string, seasonID string) 
           COUNT(*)::BIGINT AS attempts,
           SUM(SHOT_MADE_FLAG)::BIGINT AS made,
           (made/attempts) *100 ::DOUBLE AS fg_pct
-        FROM nba_data.player_shotchart_raw psr
+        FROM nba_data.player_shotchart psr
 		JOIN nba_data.player_boxscores pb on psr.player_id = pb.player_id and psr.game_id = pb.GAME_ID
 		JOIN nba_data.team_roster tr on psr.player_id = tr.player_id
         WHERE tr.PLAYER = ?
-          AND psr.SEASON_ID = ?
+          AND psr.SEASON = ?
         GROUP BY SHOT_ZONE_BASIC,SHOT_ZONE_AREA
 	`
 	rows, err := db.Query(query, playerName, seasonID)
@@ -463,73 +464,48 @@ func GetPlayerAvgShotChartStats(db *sql.DB, playerName string, seasonID string) 
 	return stats, nil
 }
 
-func opponentZonesTable() string {
-	if t := os.Getenv("OPP_ZONES_TABLE"); t != "" {
-		return t
-	}
-	// Keep this consistent with your other queries (schema prefix: nba_data.*).
-	// If your table lives under nba_data.main.team_opponent_zones in MotherDuck,
-	// you can set OPP_ZONES_TABLE to "nba_data.main.team_opponent_zones" at runtime.
-	return "nba_data.team_opponent_zones"
-}
-
-// GetOpponentZonesByTeamSeason fetches opponent overall shooting by zone
-// for a given team abbreviation and season.
-// Returns a map keyed by region name with FGM/FGA/FG_PCT (FG_PCT is 0..1).
-func GetOpponentZonesByTeamSeason(db *sql.DB, teamAbbr, season string) (*models.OpponentZonesResponse, error) {
+func GetOpponentZonesByTeamSeason(db *sql.DB, teamName, season string) ([]models.ZoneValue, error) {
 	// FG_RANK and OUT_OF are now persisted in the table by the Python pipeline.
-	query := fmt.Sprintf(`
-        SELECT REGION, FGM, FGA, FG_PCT, FG_RANK, OUT_OF
-        FROM %s
-        WHERE SEASON = ?
-          AND UPPER(TEAM_ABBR) = UPPER(?)
-    `, opponentZonesTable())
+	query := `
+        SELECT 
+			ZONE, 
+			OPP_FGM, 
+			RANK() OVER (PARTITION BY ZONE, INGESTED_DATE ORDER BY OPP_FGM ASC) AS OPP_FGM_RANK,
+			OPP_FGA, 
+			RANK() OVER (PARTITION BY ZONE, INGESTED_DATE ORDER BY OPP_FGA ASC) AS OPP_FGA_RANK,
+			OPP_FG_PCT, 
+			RANK() OVER (PARTITION BY ZONE, INGESTED_DATE ORDER BY OPP_FG_PCT ASC) AS OPP_FG_PCT_RANK
+		FROM 
+			nba_data.shooting_zones_defense
+		WHERE 
+			SEASON=?
+		QUALIFY TEAM_NAME = ? AND INGESTED_DATE = (SELECT MAX(INGESTED_DATE) FROM nba_data.shooting_zones_defense WHERE SEASON=?)
+    `
 
 	// only two args – season, teamAbbr
-	rows, err := db.Query(query, season, teamAbbr)
+	rows, err := db.Query(query, season, teamName, season)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query opponent zones: %w", err)
 	}
 	defer rows.Close()
 
-	zones := make(map[string]models.ZoneValue, 8)
+	var zones []models.ZoneValue
 
 	for rows.Next() {
-		var (
-			region      string
-			fgm, fga    float64
-			fgp         float64
-			rank, outOf int
-		)
+		var zone models.ZoneValue
 
-		if err := rows.Scan(&region, &fgm, &fga, &fgp, &rank, &outOf); err != nil {
+		if err := rows.Scan(&zone.Zone, &zone.Fgm, &zone.FgmRank, &zone.Fga, &zone.FgaRank, &zone.FgPct, &zone.FgPctRank); err != nil {
 			return nil, fmt.Errorf("failed to scan opponent zone row: %w", err)
 		}
+		zones = append(zones, zone)
 
-		// take addresses of local vars so struct gets *float64 / *int
-		fgmCopy := fgm
-		fgaCopy := fga
-		fgpCopy := fgp
-		rankCopy := rank
-		outOfCopy := outOf
-		zones[region] = models.ZoneValue{
-			FgPct:  &fgpCopy,
-			Fgm:    &fgmCopy,
-			Fga:    &fgaCopy,
-			FgRank: &rankCopy,
-			OutOf:  &outOfCopy,
-		}
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating opponent zone rows: %w", err)
 	}
 
-	return &models.OpponentZonesResponse{
-		Team:   teamAbbr,
-		Season: season,
-		Zones:  zones,
-	}, nil
+	return zones, nil
 }
 
 func GetPropOdds(db *sql.DB, name string, market string) ([]models.Odds, error) {

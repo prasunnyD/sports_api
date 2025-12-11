@@ -130,10 +130,11 @@ type NBAPlayerHeadlineStats struct {
 }
 
 type NBAPlayerShotChartStats struct {
-	LocX         int    `json:"loc_x"`
-	LocY         int    `json:"loc_y"`
-	ShotMadeFlag int    `json:"shot_made_flag"`
-	Opponent     string `json:"opponent"`
+	GameDate     time.Time `json:game_date`
+	LocX         int       `json:"loc_x"`
+	LocY         int       `json:"loc_y"`
+	ShotMadeFlag int       `json:"shot_made_flag"`
+	Opponent     string    `json:"opponent"`
 }
 
 type NBAPlayerAvgShotChartStats struct {
@@ -145,11 +146,13 @@ type NBAPlayerAvgShotChartStats struct {
 }
 
 type ZoneValue struct {
-	FgPct  *float64 `json:"fg_pct,omitempty"`
-	Fgm    *float64 `json:"fgm,omitempty"`
-	Fga    *float64 `json:"fga,omitempty"`
-	FgRank *int     `json:"fg_rank"` // <- no omitempty
-	OutOf  *int     `json:"out_of"`  // <- no omitempty
+	Zone      string  `json:"zone"`
+	FgPct     float64 `json:"fg_pct,omitempty"`
+	Fgm       float64 `json:"fgm,omitempty"`
+	Fga       float64 `json:"fga,omitempty"`
+	FgPctRank int     `json:"fg_pct_rank"`
+	FgmRank   int     `json:"fgm_rank"`
+	FgaRank   int     `json:"fga_pct_rank"`
 }
 
 type OpponentZonesResponse struct {
