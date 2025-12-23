@@ -382,6 +382,12 @@ type NFLTeamDefenseStats struct {
 	ScrambleRateRank                string  `json:"scramble_rate_rank"`
 	IntRate                         string  `json:"int_rate"`
 	IntRateRank                     string  `json:"int_rate_rank"`
+	YardsAllowedWR                  float64 `json:"yds_allowed_wr"`
+	YardsAllowedWRRank              int     `json:"yds_allowed_wr_rank"`
+	YardsAllowedTE                  float64 `json:"yds_allowed_te"`
+	YardsAllowedTERank              int     `json:"yds_allowed_te_rank"`
+	YardsAllowedRB                  float64 `json:"yds_allowed_rb"`
+	YardsAllowedRBRank              int     `json:"yds_allowed_rb_rank"`
 }
 
 type NFLTeamOffenseStats struct {
@@ -416,6 +422,14 @@ type NFLTeamOffenseStats struct {
 	ScrambleRateRank        int     `json:"scramble_rate_rank"`
 	IntRate                 string  `json:"int_rate"`
 	IntRateRank             int     `json:"int_rate_rank"`
+	TimeToThrow             float32 `json:"time_to_throw"`
+	TimeToThrowRank         int     `json:"time_to_throw_rank"`
+	PressureRateAllowed     float32 `json:"pressure_rate_allowed"`
+	PressureRateAllowedRank int     `json:"pressure_rate_allowed_rank"`
+	ExplosivePlayRate       float32 `json:"explosive_play_rate"`
+	ExplosivePlayRateRank   int     `json:"explosive_play_rate_rank"`
+	RushStuffRate           float32 `json:"rush_stuff_rate"`
+	RushStuffRateRank       int     `json:"rush_stuff_rate_rank"`
 }
 
 type NFLPassingPBPStats struct {

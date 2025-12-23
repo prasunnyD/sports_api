@@ -455,7 +455,13 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 			sumer."scramble_%",
 			sumer."scramble_%_rank",
 			sumer."int_%",
-			sumer."int_%_rank"
+			sumer."int_%_rank",
+			sds.ypt_allowed_wr,
+			sds.ypt_allowed_wr_rank,
+			sds.ypt_allowed_te,
+			sds.ypt_allowed_te_rank,
+			sds.ypt_allowed_rb,
+			sds.ypt_allowed_rb_rank,
 		FROM
 			nfl_data.nfl_team_defensive_stats_db tds
 			JOIN nfl_data.nfl_sharp_defense_stats sds
@@ -507,6 +513,12 @@ func GetNFLTeamDefenseStats(db *sql.DB, teamName string) (models.NFLTeamDefenseS
 		&teamDefenseStats.ScrambleRateRank,
 		&teamDefenseStats.IntRate,
 		&teamDefenseStats.IntRateRank,
+		&teamDefenseStats.YardsAllowedWR,
+		&teamDefenseStats.YardsAllowedWRRank,
+		&teamDefenseStats.YardsAllowedTE,
+		&teamDefenseStats.YardsAllowedTERank,
+		&teamDefenseStats.YardsAllowedRB,
+		&teamDefenseStats.YardsAllowedRBRank,
 	)
 	if err != nil {
 		return models.NFLTeamDefenseStats{}, fmt.Errorf("failed to scan team defense stats row: %w", err)
@@ -547,10 +559,20 @@ func GetNFLTeamOffenseStats(db *sql.DB, teamName string) (models.NFLTeamOffenseS
 			sumer."scramble_%",
 			sumer."scramble_%_rank",
 			sumer."int_%",
-			sumer."int_%_rank"
+			sumer."int_%_rank",
+			sos.time_to_throw,
+			sos.time_to_throw_rank,
+			sos.explosive_play_rate,
+			sos.explosive_play_rate_rank,
+			sos.pressure_rate_allowed,
+			sos.pressure_rate_allowed_rank,
+			sos.rush_stuff_rate,
+			sos.rush_stuff_rate_rank,
 		from nfl_data.nfl_team_offense_advanced_stats oa
 		join nfl_data.nfl_team_passing_stats_db ps on oa.team_name = ps.team_name
 		join nfl_data.nfl_team_rushing_stats_db rs on oa.team_name = rs.team_name
+		JOIN nfl_data.nfl_sharp_offense_stats sos
+				ON oa.team_name = sos.team
 		JOIN nfl_data.nfl_sumer_offense_stats sumer
 				ON sumer.team = oa.team_name
 		where oa.team_name = ?
@@ -589,6 +611,14 @@ func GetNFLTeamOffenseStats(db *sql.DB, teamName string) (models.NFLTeamOffenseS
 		&teamOffenseStats.ScrambleRateRank,
 		&teamOffenseStats.IntRate,
 		&teamOffenseStats.IntRateRank,
+		&teamOffenseStats.TimeToThrow,
+		&teamOffenseStats.TimeToThrowRank,
+		&teamOffenseStats.ExplosivePlayRate,
+		&teamOffenseStats.ExplosivePlayRateRank,
+		&teamOffenseStats.PressureRateAllowed,
+		&teamOffenseStats.PressureRateAllowedRank,
+		&teamOffenseStats.RushStuffRate,
+		&teamOffenseStats.RushStuffRateRank,
 	)
 	if err != nil {
 		return models.NFLTeamOffenseStats{}, fmt.Errorf("failed to scan team offense stats row: %w", err)

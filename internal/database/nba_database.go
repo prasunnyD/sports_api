@@ -46,6 +46,7 @@ func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 			WHERE t2.Team = t1.Team
 		)) nis ON nis."Player Name" = tr.PLAYER 
 		WHERE tr.TEAM = ?
+		AND NUM IS NOT NULL
 		order by PLAYER;
 	`
 
