@@ -3,12 +3,13 @@ package main
 import (
 	"log"
 	"os"
+	"sports_api/internal/database"
+	"sports_api/internal/routes"
+	_ "time/tzdata"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
-	"sports_api/internal/database"
-	"sports_api/internal/routes"
 )
 
 func main() {
@@ -35,9 +36,9 @@ func main() {
 	// Add CORS middleware
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins: []string{
-			"http://localhost:8080",  
+			"http://localhost:8080",
 			"https://www.sharpr-analytics.com", // Production www domain
-			"https://sharpr-analytics.com", // Production domain
+			"https://sharpr-analytics.com",     // Production domain
 			"https://api.sharpr-analytics.com", // API domain itself
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -67,4 +68,4 @@ func main() {
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
-} 
+}

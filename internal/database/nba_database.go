@@ -4,13 +4,33 @@ import (
 	"database/sql"
 	"fmt"
 	"sports_api/internal/models"
+	"time"
 )
 
 // NBA Database operations
 
 func GetScoreboard(db *sql.DB) ([]models.Game, error) {
-	query := `SELECT game_id, home_team_city, home_team_name, away_team_city, away_team_name FROM nba_data.scoreboard`
-	rows, err := db.Query(query)
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return nil, err
+	}
+	today := time.Now().In(loc)
+	query := `SELECT
+                home_team,
+                away_team,
+                start_time::timestamptz at TIME ZONE 'America/New_York' AS est_time,
+            FROM nba_data.owlinsights_main_odds t1
+            WHERE ingested_at = (
+                SELECT MAX(ingested_at)
+                FROM nba_data.owlinsights_main_odds t2
+                WHERE t2.market = t1.market
+                AND t2.name = t1.name
+            )
+            AND market = 'h2h'
+            AND est_time::date = $1
+            GROUP BY home_team, away_team, start_time
+            ORDER BY start_time ASC`
+	rows, err := db.Query(query, today)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query Scoreboard: %w", err)
 	}
@@ -19,7 +39,7 @@ func GetScoreboard(db *sql.DB) ([]models.Game, error) {
 	var games []models.Game
 	for rows.Next() {
 		var game models.Game
-		err := rows.Scan(&game.GameID, &game.HomeCity, &game.HomeTeam, &game.AwayCity, &game.AwayTeam)
+		err := rows.Scan(&game.HomeTeam, &game.AwayTeam, &game.GameTime)
 		if err != nil {
 			return nil, fmt.Errorf("failed to game: %w", err)
 		}
@@ -45,7 +65,7 @@ func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 			FROM nba_data.nba_injuries_status t2
 			WHERE t2.Team = t1.Team
 		)) nis ON nis."Player Name" = tr.PLAYER 
-		WHERE tr.TEAM = ?
+		WHERE contains(?, tr.Team)
 		AND NUM IS NOT NULL
 		order by PLAYER;
 	`
@@ -221,7 +241,7 @@ func GetTeamDefenseStats(db *sql.DB, teamName string) (*models.NBATeamDefenseSta
 			JOIN nba_data.teams_advanced_stats adv ON opp.TEAM_ID = adv.TEAM_ID
 			JOIN nba_data.teams_four_factors_stats ff ON opp.TEAM_ID = ff.TEAM_ID
 		WHERE 
-			opp.TEAM_NAME = ?
+			contains(?, opp.TEAM_NAME)
 		LIMIT 1
 	`
 
@@ -269,7 +289,7 @@ func GetTeamOffenseStats(db *sql.DB, teamName string) (*models.NBATeamOffenseSta
 			nba_data.teams_advanced_stats adv
 			JOIN nba_data.teams_four_factors_stats ff ON adv.TEAM_ID = ff.TEAM_ID
 		WHERE 
-			adv.TEAM_NAME = ?
+			contains(?, adv.TEAM_NAME)
 		LIMIT 1
 	`
 
