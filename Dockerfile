@@ -30,6 +30,7 @@ FROM ubuntu:24.04
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libstdc++6 \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user

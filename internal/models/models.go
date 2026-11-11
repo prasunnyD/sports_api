@@ -44,11 +44,9 @@ type TeamGameLog struct {
 
 // Game represents a live game
 type Game struct {
-	GameID   string `json:"game_id"`
-	HomeCity string `json:"home_city"`
-	HomeTeam string `json:"home_team"`
-	AwayCity string `json:"away_city"`
-	AwayTeam string `json:"away_team"`
+	HomeTeam string    `json:"home_team"`
+	AwayTeam string    `json:"away_team"`
+	GameTime time.Time `json:"game_time"`
 }
 
 // TeamDefenseStats represents team defensive statistics
