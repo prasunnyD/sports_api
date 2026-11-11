@@ -28,6 +28,7 @@ type NBAGameStats struct {
 	Rebounds          float64 `json:"rebounds"`
 	ThreePointersMade float64 `json:"threePointersMade"`
 	Minutes           float64 `json:"minutes"`
+	UsageRate         float64 `json:"usage_rate"`
 }
 
 // PlayerGameLog represents a player's game log entry

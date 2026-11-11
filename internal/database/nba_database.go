@@ -134,14 +134,15 @@ func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[str
 			assists, 
 			reboundsTotal, 
 			threePointersMade, 
-			minutes_per_game
+			minutes_per_game,
+			usage_rate
 		FROM 
 			nba_data.player_boxscores bx
 			JOIN nba_data.team_roster tr ON bx.player_id = tr.player_id
 		WHERE 
 			tr.PLAYER = ?
 		ORDER BY 
-			GAME_ID DESC
+			game_date DESC
 		LIMIT ?
 	`
 
@@ -155,7 +156,7 @@ func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[str
 	for rows.Next() {
 		var gameDate string
 		var stats models.NBAGameStats
-		err := rows.Scan(&gameDate, &stats.Points, &stats.Assists, &stats.Rebounds, &stats.ThreePointersMade, &stats.Minutes)
+		err := rows.Scan(&gameDate, &stats.Points, &stats.Assists, &stats.Rebounds, &stats.ThreePointersMade, &stats.Minutes, &stats.UsageRate)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan player game log row: %w", err)
 		}
