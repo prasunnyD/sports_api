@@ -29,7 +29,6 @@ func SetupNBARoutes(router *gin.RouterGroup, db *sql.DB) {
 		nba.POST("/poisson-dist", nbaHandler.GetPoissonDistribution)
 		nba.GET("/scoreboard", nbaHandler.GetScoreboard)
 		nba.GET("/odds/:market/:name", nbaHandler.GetPropOdds)
-		nba.GET("/odds/moneyline/:team", nbaHandler.GetMoneylineOdds)
 
 		// Opponent allowed FG% by zone
 		// 	nba.GET("/opponent-shooting/by-zone", nbaHandler.GetOpponentShootingByZone)

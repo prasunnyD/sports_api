@@ -28,6 +28,7 @@ type NBAGameStats struct {
 	Rebounds          float64 `json:"rebounds"`
 	ThreePointersMade float64 `json:"threePointersMade"`
 	Minutes           float64 `json:"minutes"`
+	UsageRate         float64 `json:"usage_rate"`
 }
 
 // PlayerGameLog represents a player's game log entry
@@ -42,11 +43,17 @@ type TeamGameLog struct {
 	Points   float64 `json:"points"`
 }
 
-// Game represents a live game
+// Game represents a live game with moneyline and spread odds
 type Game struct {
-	HomeTeam string    `json:"home_team"`
-	AwayTeam string    `json:"away_team"`
-	GameTime time.Time `json:"game_time"`
+	HomeTeam        string    `json:"home_team"`
+	AwayTeam        string    `json:"away_team"`
+	GameTime        time.Time `json:"game_time"`
+	HomeMoneyline   *int      `json:"home_moneyline"`
+	AwayMoneyline   *int      `json:"away_moneyline"`
+	HomeSpread      *float64  `json:"home_spread"`
+	HomeSpreadPrice *int      `json:"home_spread_price"`
+	AwaySpread      *float64  `json:"away_spread"`
+	AwaySpreadPrice *int      `json:"away_spread_price"`
 }
 
 // TeamDefenseStats represents team defensive statistics
@@ -441,12 +448,14 @@ type NFLPassingPBPStats struct {
 }
 
 type Odds struct {
-	Name      string  `json:"name"`
-	Market    string  `json:"market"`
-	Sportbook string  `json:"sportbook"`
-	Line      float32 `json:"line"`
-	Over      int     `json:"over"`
-	Under     int     `json:"under"`
+	Name         string    `json:"name"`
+	Market       string    `json:"market"`
+	Sportbook    string    `json:"sportbook"`
+	Line         float32   `json:"line"`
+	Over         int       `json:"over"`
+	Under        int       `json:"under"`
+	IngestedTime time.Time `json:"ingested_time"`
+	StartTime    time.Time `json:"start_time"`
 }
 
 type MoneylineOdds struct {

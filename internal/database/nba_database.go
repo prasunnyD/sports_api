@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"sports_api/internal/models"
 	"time"
 )
@@ -14,22 +15,38 @@ func GetScoreboard(db *sql.DB) ([]models.Game, error) {
 	if err != nil {
 		return nil, err
 	}
-	today := time.Now().In(loc)
-	query := `SELECT
-                home_team,
-                away_team,
-                start_time::timestamptz at TIME ZONE 'America/New_York' AS est_time,
-            FROM nba_data.owlinsights_main_odds t1
-            WHERE ingested_at = (
-                SELECT MAX(ingested_at)
-                FROM nba_data.owlinsights_main_odds t2
-                WHERE t2.market = t1.market
-                AND t2.name = t1.name
-            )
-            AND market = 'h2h'
-            AND est_time::date = $1
-            GROUP BY home_team, away_team, start_time
-            ORDER BY start_time ASC`
+	today := time.Now().In(loc).Format("2006-01-02")
+
+	query := `
+		SELECT
+			home_team,
+			away_team,
+			game_time,
+			MAX(CASE WHEN market = 'h2h'     AND "name" = home_team THEN price END) AS home_moneyline,
+			MAX(CASE WHEN market = 'h2h'     AND "name" = away_team THEN price END) AS away_moneyline,
+			MAX(CASE WHEN market = 'spreads' AND "name" = home_team THEN line  END) AS home_spread,
+			MAX(CASE WHEN market = 'spreads' AND "name" = home_team THEN price END) AS home_spread_price,
+			MAX(CASE WHEN market = 'spreads' AND "name" = away_team THEN line  END) AS away_spread,
+			MAX(CASE WHEN market = 'spreads' AND "name" = away_team THEN price END) AS away_spread_price
+		FROM (
+			SELECT
+				home_team,
+				away_team,
+				price,
+				line,
+				"name",
+				market,
+				start_time::timestamptz AT TIME ZONE 'America/New_York' AS game_time
+			FROM nba_data.owlinsights_main_odds
+			WHERE market IN ('h2h', 'spreads')
+			AND (start_time::timestamptz AT TIME ZONE 'America/New_York')::date = ?
+			QUALIFY ingested_at = MAX(ingested_at) FILTER (WHERE ingested_at <= start_time::timestamptz)
+				OVER (PARTITION BY "name", market, (start_time::timestamptz AT TIME ZONE 'America/New_York')::date)
+		)
+		GROUP BY home_team, away_team, game_time
+		ORDER BY game_time ASC`
+
+	log.Printf("[GetScoreboard] querying for date=%s", today)
 	rows, err := db.Query(query, today)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query Scoreboard: %w", err)
@@ -39,15 +56,27 @@ func GetScoreboard(db *sql.DB) ([]models.Game, error) {
 	var games []models.Game
 	for rows.Next() {
 		var game models.Game
-		err := rows.Scan(&game.HomeTeam, &game.AwayTeam, &game.GameTime)
+		err := rows.Scan(
+			&game.HomeTeam,
+			&game.AwayTeam,
+			&game.GameTime,
+			&game.HomeMoneyline,
+			&game.AwayMoneyline,
+			&game.HomeSpread,
+			&game.HomeSpreadPrice,
+			&game.AwaySpread,
+			&game.AwaySpreadPrice,
+		)
 		if err != nil {
-			return nil, fmt.Errorf("failed to game: %w", err)
+			return nil, fmt.Errorf("failed to scan game row: %w", err)
 		}
+		game.GameTime = game.GameTime.In(loc)
 		games = append(games, game)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating over NBA game rows: %w", err)
 	}
+	log.Printf("[GetScoreboard] returned %d games", len(games))
 	return games, nil
 }
 
@@ -134,14 +163,15 @@ func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[str
 			assists, 
 			reboundsTotal, 
 			threePointersMade, 
-			minutes_per_game
+			minutes_per_game,
+			usage_rate
 		FROM 
 			nba_data.player_boxscores bx
 			JOIN nba_data.team_roster tr ON bx.player_id = tr.player_id
 		WHERE 
 			tr.PLAYER = ?
 		ORDER BY 
-			GAME_ID DESC
+			game_date DESC
 		LIMIT ?
 	`
 
@@ -155,7 +185,7 @@ func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[str
 	for rows.Next() {
 		var gameDate string
 		var stats models.NBAGameStats
-		err := rows.Scan(&gameDate, &stats.Points, &stats.Assists, &stats.Rebounds, &stats.ThreePointersMade, &stats.Minutes)
+		err := rows.Scan(&gameDate, &stats.Points, &stats.Assists, &stats.Rebounds, &stats.ThreePointersMade, &stats.Minutes, &stats.UsageRate)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan player game log row: %w", err)
 		}
@@ -530,21 +560,23 @@ func GetOpponentZonesByTeamSeason(db *sql.DB, teamName, season string) ([]models
 }
 
 func GetPropOdds(db *sql.DB, name string, market string) ([]models.Odds, error) {
-	query := `SELECT 
-				player,
-				sport_book,
-				market,
-				line,
-				over_odds,
-				under_odds
-			FROM nba_data.nba_prop_odds t1
-			WHERE "timestamp" = (
-				SELECT MAX("timestamp")
-				FROM nba_data.nba_prop_odds t2
-				WHERE t2.sport_book = t1.sport_book 
-				AND t2.player = t1.player
-			) and sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') and player = ? and market = ?`
-	rows, err := db.Query(query, name, market)
+	query := `SELECT playerName, sportbook, category, line, overPrice, underPrice, ingested_time,
+					startTime AT TIME ZONE 'America/New_York' AS game_time
+				FROM nba_data.nba_owlinsight_prop_odds
+				WHERE playerName = ?
+				AND (startTime AT TIME ZONE 'America/New_York')::date = ?
+				AND (ingested_time AT TIME ZONE 'America/New_York')::date = ?
+				AND underPrice IS NOT NULL
+				QUALIFY ingested_time = MAX(ingested_time) FILTER (WHERE ingested_time <= startTime)
+					OVER (PARTITION BY playerName, sportbook, (ingested_time AT TIME ZONE 'America/New_York')::date)`
+
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return nil, err
+	}
+	today := time.Now().In(loc).Format("2006-01-02")
+	log.Printf("[GetPropOdds] query params: playerName=%q market=%q gameDate=%q ingestedDate=%q", name, market, today, today)
+	rows, err := db.Query(query, name, today, today)
 	if err != nil {
 		return nil, fmt.Errorf("error querying odds: %w", err)
 	}
@@ -552,48 +584,17 @@ func GetPropOdds(db *sql.DB, name string, market string) ([]models.Odds, error) 
 	var odds []models.Odds
 	for rows.Next() {
 		var odd models.Odds
-		err := rows.Scan(&odd.Name, &odd.Sportbook, &odd.Market, &odd.Line, &odd.Over, &odd.Under)
+		err := rows.Scan(&odd.Name, &odd.Sportbook, &odd.Market, &odd.Line, &odd.Over, &odd.Under, &odd.IngestedTime, &odd.StartTime)
 		if err != nil {
 			return nil, fmt.Errorf("error in odds: %w", err)
 		}
+		odd.IngestedTime = odd.IngestedTime.In(loc)
+		odd.StartTime = odd.StartTime.In(loc)
 		odds = append(odds, odd)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating over player odds rows: %w", err)
 	}
 
-	return odds, nil
-}
-
-func GetMoneylineOdds(db *sql.DB, team string) ([]models.MoneylineOdds, error) {
-	query := `SELECT
-        		team,
-				sport_book,
-				price,
-			FROM nba_data.nba_moneyline_odds t1
-			WHERE "timestamp" = (
-				SELECT MAX("timestamp")
-				FROM nba_data.nba_moneyline_odds t2
-				WHERE t2.sport_book = t1.sport_book 
-				AND t2.team = t1.team)
-			AND sport_book IN ('FanDuel', 'DraftKings', 'BetMGM') AND team= ?`
-
-	rows, err := db.Query(query, team)
-	defer rows.Close()
-	var odds []models.MoneylineOdds
-	if err != nil {
-		return nil, fmt.Errorf("error querying odds: %w", err)
-	}
-	for rows.Next() {
-		var odd models.MoneylineOdds
-		err := rows.Scan(&odd.Team, &odd.Sportbook, &odd.Price)
-		if err != nil {
-			return nil, fmt.Errorf("error in odds: %w", err)
-		}
-		odds = append(odds, odd)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating over player odds rows: %w", err)
-	}
 	return odds, nil
 }
