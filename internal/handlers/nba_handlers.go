@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"log"
 	"math"
 	"net/http"
 	"sports_api/internal/database"
@@ -464,6 +465,7 @@ func (h *NBAHandler) GetOpponentShootingByZone(c *gin.Context) {
 func (h *NBAHandler) GetPropOdds(c *gin.Context) {
 	name := c.Param("name")
 	market := c.Param("market")
+	log.Printf("[GetPropOdds] request path=%s name=%q market=%q", c.Request.URL.Path, name, market)
 
 	if strings.TrimSpace(name) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -480,26 +482,6 @@ func (h *NBAHandler) GetPropOdds(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, odds)
-}
-
-func (h *NBAHandler) GetMoneylineOdds(c *gin.Context) {
-	team := c.Param("team")
-
-	if strings.TrimSpace(team) == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Name is required",
-		})
-		return
-	}
-
-	odds, err := database.GetMoneylineOdds(h.db, team)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to retrieve odds",
-			"details": err.Error(),
-		})
-		return
-	}
+	log.Printf("[GetPropOdds] response: %d odds for name=%q market=%q", len(odds), name, market)
 	c.JSON(http.StatusOK, odds)
 }
