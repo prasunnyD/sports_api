@@ -83,17 +83,19 @@ func GetScoreboard(db *sql.DB) ([]models.Game, error) {
 // GetNBAPlayersByTeam retrieves all players for a given NBA team
 func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	query := `
-		SELECT PLAYER_ID, PLAYER, "POSITION", tr.TEAM, NUM, COALESCE(nis."Current Status", '') as current_status
+		SELECT PLAYER_ID, PLAYER, "POSITION", tr.TEAM, NUM, nis."statusLabel", nis."bodyPart", nis."ingestedAt"
 		FROM nba_data.team_roster tr
 		left join(SELECT 
-			"Player Name",
-			"Current Status",
-		FROM nba_data.nba_injuries_status t1
-		WHERE ingested_date = (
-			SELECT MAX(ingested_date)
-			FROM nba_data.nba_injuries_status t2
-			WHERE t2.Team = t1.Team
-		)) nis ON nis."Player Name" = tr.PLAYER 
+			"playerName",
+			"statusLabel",
+			"bodyPart",
+			"ingestedAt"
+		FROM nba_data.nba_injuries t1
+		WHERE ingestedAt = (
+			SELECT MAX(ingestedAt)
+			FROM nba_data.nba_injuries t2
+			WHERE t2.teamName = t1.teamName
+		)) nis ON nis."playerName" = tr.PLAYER 
 		WHERE contains(?, tr.Team)
 		AND NUM IS NOT NULL
 		order by PLAYER;
@@ -108,7 +110,7 @@ func GetNBAPlayersByTeam(db *sql.DB, teamCity string) ([]models.Player, error) {
 	var players []models.Player
 	for rows.Next() {
 		var player models.Player
-		err := rows.Scan(&player.PlayerID, &player.PlayerName, &player.Position, &player.TeamID, &player.Number, &player.Status)
+		err := rows.Scan(&player.PlayerID, &player.PlayerName, &player.Position, &player.TeamID, &player.Number, &player.Status, &player.BodyPart, &player.IngestedAt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan NBA player row: %w", err)
 		}
@@ -164,7 +166,8 @@ func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[str
 			reboundsTotal, 
 			threePointersMade, 
 			minutes_per_game,
-			usage_rate
+			usage_rate,
+			opponent
 		FROM 
 			nba_data.player_boxscores bx
 			JOIN nba_data.team_roster tr ON bx.player_id = tr.player_id
@@ -185,7 +188,7 @@ func GetPlayerLastXGames(db *sql.DB, playerName string, lastXGames int) (map[str
 	for rows.Next() {
 		var gameDate string
 		var stats models.NBAGameStats
-		err := rows.Scan(&gameDate, &stats.Points, &stats.Assists, &stats.Rebounds, &stats.ThreePointersMade, &stats.Minutes, &stats.UsageRate)
+		err := rows.Scan(&gameDate, &stats.Points, &stats.Assists, &stats.Rebounds, &stats.ThreePointersMade, &stats.Minutes, &stats.UsageRate, &stats.Opponent)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan player game log row: %w", err)
 		}

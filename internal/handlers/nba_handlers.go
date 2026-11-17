@@ -9,6 +9,7 @@ import (
 	"sports_api/internal/models"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -182,14 +183,21 @@ func (h *NBAHandler) GetTeamRoster(c *gin.Context) {
 	}
 
 	// Format response similar to Python API
-	roster := make([]map[string]string, len(players))
+	roster := make([]models.PlayerRosterResponse, len(players))
 	for i, player := range players {
-		roster[i] = map[string]string{
-			"PLAYER_ID": player.PlayerID,
-			"PLAYER":    player.PlayerName,
-			"NUM":       player.Number,
-			"POSITION":  player.Position,
-			"STATUS":    player.Status,
+		var ingestedAt *time.Time
+		if player.IngestedAt.Valid {
+			t := player.IngestedAt.Time
+			ingestedAt = &t
+		}
+		roster[i] = models.PlayerRosterResponse{
+			PlayerID:   player.PlayerID,
+			Player:     player.PlayerName,
+			Number:     player.Number,
+			Position:   player.Position,
+			Status:     player.Status.String,
+			BodyPart:   player.BodyPart.String,
+			IngestedAt: ingestedAt,
 		}
 	}
 
