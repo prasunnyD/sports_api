@@ -1,16 +1,68 @@
 package models
 
-import "time"
+import (
+	"database/sql"
+	"encoding/json"
+	"time"
+)
 
 // Player represents an NBA player
 type Player struct {
-	PlayerID   string `json:"player_id"`
-	PlayerName string `json:"player_name"`
-	Position   string `json:"position"`
-	TeamName   string `json:"team_name"`
-	TeamID     string `json:"team_id"`
-	Number     string `json:"number"`
-	Status     string `json:"status"`
+	PlayerID   string         `json:"player_id"`
+	PlayerName string         `json:"player_name"`
+	Position   string         `json:"position"`
+	TeamName   string         `json:"team_name"`
+	TeamID     string         `json:"team_id"`
+	Number     string         `json:"number"`
+	Status     sql.NullString `json:"status"`
+	BodyPart   sql.NullString `json:"body_part"`
+	IngestedAt sql.NullTime   `json:"ingested_at"`
+}
+
+// MarshalJSON ensures sql.Null* fields serialize as plain values instead of {"String":"...","Valid":true}
+func (p Player) MarshalJSON() ([]byte, error) {
+	type Alias struct {
+		PlayerID   string     `json:"player_id"`
+		PlayerName string     `json:"player_name"`
+		Position   string     `json:"position"`
+		TeamName   string     `json:"team_name"`
+		TeamID     string     `json:"team_id"`
+		Number     string     `json:"number"`
+		Status     *string    `json:"status"`
+		BodyPart   *string    `json:"body_part"`
+		IngestedAt *time.Time `json:"ingested_at"`
+	}
+
+	a := Alias{
+		PlayerID:   p.PlayerID,
+		PlayerName: p.PlayerName,
+		Position:   p.Position,
+		TeamName:   p.TeamName,
+		TeamID:     p.TeamID,
+		Number:     p.Number,
+	}
+	if p.Status.Valid {
+		a.Status = &p.Status.String
+	}
+	if p.BodyPart.Valid {
+		a.BodyPart = &p.BodyPart.String
+	}
+	if p.IngestedAt.Valid {
+		a.IngestedAt = &p.IngestedAt.Time
+	}
+
+	return json.Marshal(a)
+}
+
+// PlayerRosterResponse is the API response shape for a roster entry
+type PlayerRosterResponse struct {
+	PlayerID  string  `json:"PLAYER_ID"`
+	Player    string  `json:"PLAYER"`
+	Number    string  `json:"NUM"`
+	Position  string  `json:"POSITION"`
+	Status    string  `json:"STATUS"`
+	BodyPart  string  `json:"BODY_PART"`
+	IngestedAt *time.Time `json:"INGESTED_AT"`
 }
 
 // Team represents an NBA team
@@ -29,6 +81,7 @@ type NBAGameStats struct {
 	ThreePointersMade float64 `json:"threePointersMade"`
 	Minutes           float64 `json:"minutes"`
 	UsageRate         float64 `json:"usage_rate"`
+	Opponent          string  `json:"opponent"`
 }
 
 // PlayerGameLog represents a player's game log entry
